@@ -55,15 +55,15 @@
 
   /* glass */
   .glass{
-    background:rgba(255,255,255,.76);border:1px solid rgba(255,255,255,.92);border-radius:var(--radius);
-    backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);
-    box-shadow:0 4px 32px -8px rgba(0,0,0,.09),inset 0 1px 0 rgba(255,255,255,.96);
+    background:rgba(255,255,255,.60);border:1px solid rgba(255,255,255,.88);border-radius:var(--radius);
+    backdrop-filter:blur(36px) saturate(200%);-webkit-backdrop-filter:blur(36px) saturate(200%);
+    box-shadow:0 4px 32px -8px rgba(0,0,0,.09),inset 0 1px 0 rgba(255,255,255,.98);
   }
 
   /* brand */
   .brand{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:28px}
   .brand .mark{width:36px;height:36px;flex:none}
-  .brand .name{font-size:20px;font-weight:800;letter-spacing:-.03em}
+  .brand .name{font-size:21px;font-weight:800;letter-spacing:-.01em;font-family:'Playfair Display',Georgia,serif}
   .brand .name b{color:var(--text)}
   .brand .name span{background:linear-gradient(96deg,var(--blue),var(--lavender));-webkit-background-clip:text;background-clip:text;color:transparent}
 
@@ -71,7 +71,7 @@
   .hero{text-align:center;margin-bottom:28px}
   .hero-icon{width:100px;height:100px;margin:0 auto 20px;display:block}
   .hero h1{font-size:clamp(26px,6.5vw,40px);font-weight:850;line-height:1.2;letter-spacing:-.03em;margin-bottom:12px}
-  .hero h1 .grad{background:linear-gradient(100deg,var(--blue),var(--lavender),var(--coral));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero h1 .grad{background:linear-gradient(100deg,var(--blue),var(--lavender),var(--coral));-webkit-background-clip:text;background-clip:text;color:transparent;font-family:'Playfair Display',Georgia,serif;font-style:italic;font-weight:700}
   .hero p{color:var(--text-dim);font-size:clamp(13.5px,3.5vw,15.5px);max-width:28em;margin:0 auto;line-height:1.65}
 
   /* panel */
@@ -105,9 +105,9 @@
 
   /* cta buttons */
   .cta{display:block;width:100%;margin-top:16px;border:0;border-radius:14px;padding:16px;font:inherit;font-weight:800;font-size:16px;color:#fff;cursor:pointer;
-    background:linear-gradient(120deg,var(--blue),var(--lavender));
-    box-shadow:0 10px 28px -10px rgba(142,124,195,.40);transition:.2s}
-  .cta:hover{filter:brightness(1.06);transform:translateY(-1px)}
+    background:linear-gradient(120deg,#7460B0,#A893CF);
+    box-shadow:0 10px 32px -8px rgba(116,96,176,.50),inset 0 1px 0 rgba(255,255,255,.18);transition:.2s;text-shadow:0 1px 2px rgba(0,0,0,.12)}
+  .cta:hover{filter:brightness(1.08);transform:translateY(-2px);box-shadow:0 14px 36px -8px rgba(116,96,176,.58),inset 0 1px 0 rgba(255,255,255,.20)}
   .cta:disabled{opacity:.35;cursor:not-allowed;transform:none;filter:none}
   .ghost{background:rgba(255,255,255,.82);border:1px solid var(--line-b);color:var(--text-dim);font:inherit;font-weight:700;font-size:14px;padding:12px 16px;border-radius:12px;cursor:pointer;transition:.2s;backdrop-filter:blur(8px)}
   .ghost:hover{color:var(--text);border-color:var(--blue);background:rgba(255,255,255,.96)}
@@ -318,6 +318,9 @@
         </linearGradient></defs>
         <path d="M14 38 L14 22 Q14 10 24 10 Q34 10 34 22 L34 38 Z" fill="url(#lg0)" opacity=".18" stroke="url(#lg0)" stroke-width="1.8"/>
         <path d="M20 34 L20 23 Q20 16 24 16 Q28 16 28 23 L28 34" stroke="url(#lg0)" stroke-width="1.2" fill="none" opacity=".5"/>
+        <!-- Reflection highlight streak -->
+        <path d="M17 16 Q19 12 23 11" stroke="rgba(255,255,255,.90)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+        <path d="M15 22 Q16 19 18 17" stroke="rgba(255,255,255,.50)" stroke-width="0.9" stroke-linecap="round" fill="none"/>
         <path d="M10 40 L38 40" stroke="#8E7CC3" stroke-width="2" stroke-linecap="round" opacity=".35"/>
         <path d="M15 44 L33 44" stroke="#8E7CC3" stroke-width="2" stroke-linecap="round" opacity=".16"/>
       </svg>
@@ -340,6 +343,9 @@
         <path d="M 37 78 L 37 46 Q 37 28 50 28 Q 63 28 63 46 L 63 78" stroke="rgba(142,124,195,.30)" stroke-width="1.5" fill="none"/>
         <!-- Peach glow accent top -->
         <ellipse cx="50" cy="28" rx="12" ry="6" fill="url(#hg2)"/>
+        <!-- Reflection highlight streaks (거울 반사광) -->
+        <path d="M 31 26 Q 34 20 40 18" stroke="rgba(255,255,255,.92)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+        <path d="M 28 34 Q 30 29 33 27" stroke="rgba(255,255,255,.55)" stroke-width="1.3" stroke-linecap="round" fill="none"/>
         <!-- Base stand -->
         <path d="M 20 86 L 80 86" stroke="#2C2C2C" stroke-width="2.5" stroke-linecap="round" opacity=".18"/>
         <path d="M 30 91 L 70 91" stroke="#2C2C2C" stroke-width="2.5" stroke-linecap="round" opacity=".08"/>
