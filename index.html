@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<title>톡미러 · 대화가 비추는 우리의 진짜 온도</title>
+<meta name="description" content="카카오톡 대화를 붙여넣거나 파일로 올리면 관계 유형·감정 온도·소통 성향을 분석해 드려요. 모든 분석은 브라우저 안에서만 일어납니다." />
+<style>
+  :root{
+    --bg:#111827;
+    --surface:#1F2937;
+    --surface2:#374151;
+    --blue:#6C8CFF;
+    --blue-dim:#4B6FE8;
+    --lavender:#A78BFA;
+    --coral:#FF7A90;
+    --warm:#FF8A5B;
+    --green:#34D399;
+    --yellow:#FBBF24;
+    --red:#F87171;
+    --text:#F9FAFB;
+    --text-dim:#9CA3AF;
+    --text-faint:#6B7280;
+    --glass:rgba(255,255,255,.05);
+    --glass-b:rgba(255,255,255,.09);
+    --line:rgba(255,255,255,.10);
+    --line-b:rgba(255,255,255,.16);
+    --radius:20px;
+    --maxw:720px;
+    font-synthesis:none;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  body{
+    font-family:"Pretendard","Pretendard Variable",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
+    color:var(--text);background:var(--bg);line-height:1.5;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;letter-spacing:-0.01em;
+  }
+  .aura{position:fixed;inset:0;z-index:-2;overflow:hidden;
+    background:radial-gradient(110% 70% at 20% -10%,rgba(108,140,255,.18) 0%,transparent 55%),
+               radial-gradient(90% 60% at 80% 100%,rgba(167,139,250,.14) 0%,transparent 50%),
+               radial-gradient(80% 50% at 50% 50%,rgba(255,122,144,.07) 0%,transparent 60%),
+               var(--bg);}
+  .aura::before,.aura::after{content:"";position:absolute;border-radius:50%;filter:blur(80px);opacity:.4;mix-blend-mode:screen}
+  .aura::before{width:50vmax;height:50vmax;left:-15vmax;top:-10vmax;background:radial-gradient(circle,#6C8CFF,transparent 65%);animation:drift1 24s ease-in-out infinite}
+  .aura::after{width:44vmax;height:44vmax;right:-14vmax;bottom:-10vmax;background:radial-gradient(circle,#A78BFA,transparent 65%);animation:drift2 28s ease-in-out infinite}
+  @keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(8vmax,6vmax) scale(1.1)}}
+  @keyframes drift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-7vmax,-5vmax) scale(1.08)}}
+  @media(prefers-reduced-motion:reduce){.aura::before,.aura::after{animation:none}*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px;width:100%}
+  .screen{display:none;min-height:100dvh;padding:clamp(28px,6vh,64px) 0 80px}
+  .screen.active{display:block;animation:fade .4s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  /* glass */
+  .glass{
+    background:var(--glass);border:1px solid var(--line);border-radius:var(--radius);
+    backdrop-filter:blur(20px) saturate(150%);-webkit-backdrop-filter:blur(20px) saturate(150%);
+    box-shadow:0 20px 50px -24px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.07);
+  }
+
+  /* brand */
+  .brand{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:28px}
+  .brand .mark{width:36px;height:36px;flex:none}
+  .brand .name{font-size:20px;font-weight:800;letter-spacing:-.03em}
+  .brand .name b{color:#fff}
+  .brand .name span{background:linear-gradient(96deg,var(--blue),var(--lavender));-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  /* hero */
+  .hero{text-align:center;margin-bottom:28px}
+  .hero-icon{width:100px;height:100px;margin:0 auto 20px;display:block}
+  .hero h1{font-size:clamp(26px,6.5vw,40px);font-weight:850;line-height:1.2;letter-spacing:-.03em;margin-bottom:12px}
+  .hero h1 .grad{background:linear-gradient(100deg,var(--blue),var(--lavender),var(--coral));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{color:var(--text-dim);font-size:clamp(13.5px,3.5vw,15.5px);max-width:28em;margin:0 auto;line-height:1.65}
+
+  /* panel */
+  .panel{padding:22px}
+  .tabs{display:flex;gap:6px;background:rgba(0,0,0,.30);padding:5px;border-radius:14px;margin-bottom:16px}
+  .tab{flex:1;border:0;background:transparent;color:var(--text-dim);font:inherit;font-weight:700;font-size:14px;padding:10px;border-radius:10px;cursor:pointer;transition:.2s}
+  .tab[aria-selected="true"]{background:var(--glass-b);color:#fff;box-shadow:0 2px 10px -4px rgba(0,0,0,.5)}
+  textarea{width:100%;min-height:160px;resize:vertical;background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:14px;color:var(--text);font:inherit;font-size:14px;padding:14px;line-height:1.6}
+  textarea::placeholder{color:var(--text-faint)}
+  textarea:focus,.tab:focus-visible,button:focus-visible,.drop:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+  .hint{font-size:12px;color:var(--text-faint);margin-top:8px;line-height:1.55;display:none}
+  .hint.show{display:block}
+  .panel[data-mode="paste"] .hint-paste{display:block}
+  .panel[data-mode="file"] .hint-file{display:block}
+
+  .drop{border:1.5px dashed var(--line-b);border-radius:14px;padding:28px 16px;text-align:center;color:var(--text-dim);cursor:pointer;transition:.2s;background:rgba(0,0,0,.15)}
+  .drop:hover,.drop.over{border-color:var(--blue);background:rgba(108,140,255,.07);color:var(--text)}
+  .drop b{display:block;color:#fff;font-size:15px;margin-bottom:5px}
+  .drop small{font-size:12.5px;color:var(--text-faint)}
+  #fname{display:none;margin-top:10px;color:var(--green);font-size:13px;font-weight:700}
+  #fname.show{display:block}
+
+  /* privacy */
+  .privacy{display:flex;align-items:center;gap:8px;justify-content:center;margin-top:18px;color:var(--text-faint);font-size:12px;text-align:center;line-height:1.55}
+  .privacy svg{flex:none}
+
+  /* error */
+  .err{display:none;margin-top:12px;padding:12px 14px;border-radius:12px;background:rgba(248,113,113,.10);border:1px solid rgba(248,113,113,.30);color:#FCA5A5;font-size:13.5px;line-height:1.5}
+  .err.show{display:block}
+
+  /* cta buttons */
+  .cta{display:block;width:100%;margin-top:16px;border:0;border-radius:14px;padding:16px;font:inherit;font-weight:800;font-size:16px;color:#fff;cursor:pointer;
+    background:linear-gradient(96deg,var(--blue),var(--lavender));
+    box-shadow:0 10px 28px -10px rgba(108,140,255,.55);transition:.2s}
+  .cta:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  .cta:disabled{opacity:.4;cursor:not-allowed;transform:none;filter:none}
+  .ghost{background:transparent;border:1px solid var(--line);color:var(--text-dim);font:inherit;font-weight:700;font-size:14px;padding:12px 16px;border-radius:12px;cursor:pointer;transition:.2s}
+  .ghost:hover{color:#fff;border-color:var(--blue)}
+
+  /* ---- purpose screen ---- */
+  #purpose-screen .purpose-q{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;line-height:1.3}
+  #purpose-screen .purpose-sub{color:var(--text-dim);font-size:14px;margin-bottom:24px}
+  .purpose-list{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+  .pc{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:16px;background:var(--glass);border:1.5px solid var(--line);cursor:pointer;transition:.2s;text-align:left;width:100%;font:inherit;color:var(--text)}
+  .pc:hover{border-color:var(--blue);background:rgba(108,140,255,.08)}
+  .pc[aria-selected="true"]{border-color:var(--blue);background:rgba(108,140,255,.12);box-shadow:0 0 0 3px rgba(108,140,255,.18)}
+  .pc .pi{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none;font-size:20px;background:rgba(108,140,255,.15)}
+  .pc[aria-selected="true"] .pi{background:rgba(108,140,255,.28)}
+  .pc .pt{font-weight:700;font-size:15px;margin-bottom:2px}
+  .pc .pd{font-size:12.5px;color:var(--text-dim);line-height:1.45}
+  .back{background:none;border:0;color:var(--text-faint);font:inherit;font-size:13.5px;cursor:pointer;display:flex;align-items:center;gap:5px;padding:0;margin-bottom:20px}
+  .back:hover{color:var(--text)}
+  .back svg{width:16px;height:16px}
+
+  /* ---- loading ---- */
+  #loading{display:none;place-items:center;min-height:100dvh;text-align:center}
+  #loading.active{display:grid}
+  .load-icon{width:88px;height:88px;margin:0 auto 24px}
+  .load-title{font-size:18px;font-weight:800;margin-bottom:6px;letter-spacing:-.02em}
+  .load-step{color:var(--text-dim);font-size:14px;height:1.4em;transition:.25s;min-height:1.4em}
+  .bar{width:min(260px,68vw);height:6px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:20px}
+  .bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--blue),var(--lavender));transition:width .4s ease}
+
+  /* ---- report ---- */
+  .rep-head{text-align:center;margin-bottom:10px}
+  .eyebrow{font-size:11.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);margin-bottom:10px}
+  .badge{display:inline-block;font-size:clamp(19px,5vw,26px);font-weight:850;letter-spacing:-.02em;line-height:1.3;
+    background:linear-gradient(96deg,#fff,#D4CCFF);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:10px}
+  .relnote{max-width:28em;margin:0 auto 12px;color:var(--text-dim);font-size:14px;line-height:1.65}
+  .subnames{color:var(--text-dim);font-size:13.5px;margin-bottom:20px}
+  .subnames b{color:var(--text)}
+  .purpose-tag{display:inline-block;padding:5px 12px;border-radius:99px;background:rgba(108,140,255,.15);border:1px solid rgba(108,140,255,.3);color:var(--blue);font-size:12px;font-weight:700;margin-bottom:16px}
+  .modeswitch{display:inline-flex;gap:5px;background:rgba(0,0,0,.25);padding:5px;border-radius:13px;margin-bottom:20px}
+  .mode{border:0;background:transparent;color:var(--text-dim);font:inherit;font-weight:700;font-size:13px;padding:8px 14px;border-radius:9px;cursor:pointer;transition:.18s}
+  .mode[aria-selected="true"]{background:var(--glass-b);color:#fff;box-shadow:0 2px 8px -3px rgba(0,0,0,.5)}
+  .mode:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+  .grid{display:grid;gap:16px}
+  .card{padding:22px 20px 24px}
+  .card h3{font-size:12.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--text-dim);margin-bottom:18px;display:flex;align-items:center;gap:7px}
+  .card h3 .dot{width:6px;height:6px;border-radius:50%;background:var(--blue);box-shadow:0 0 8px var(--blue)}
+
+  /* temperature */
+  .temp-wrap{display:flex;align-items:center;gap:22px}
+  .gauge-ring{position:relative;width:132px;height:132px;flex:none;display:grid;place-items:center}
+  .gauge{position:absolute;inset:0;border-radius:50%;
+    background:conic-gradient(from 180deg, var(--blue) 0%, var(--lavender) 35%, var(--coral) 70%, var(--warm) 100%);
+    -webkit-mask:radial-gradient(closest-side, transparent 65%, #000 66%);mask:radial-gradient(closest-side, transparent 65%, #000 66%)}
+  .gauge-inner{position:absolute;inset:6px;border-radius:50%;box-shadow:inset 0 0 24px rgba(108,140,255,.25)}
+  .val{position:absolute;text-align:center}
+  .val b{font-size:44px;font-weight:850;display:block;line-height:1;letter-spacing:-.02em}
+  .val small{font-size:11.5px;color:var(--text-dim)}
+  .temp-desc{flex:1;min-width:0}
+  .temp-desc .big{font-size:18px;font-weight:850;margin-bottom:5px;letter-spacing:-.02em}
+  .temp-desc p{font-size:13px;color:var(--text-dim);line-height:1.6}
+  .signals{margin-top:16px}
+  .sigbar{height:8px;border-radius:99px;overflow:hidden;display:flex;background:rgba(255,255,255,.07)}
+  .sigbar .sp{background:linear-gradient(90deg,var(--green),#2DD4BF)}
+  .sigbar .sn{background:linear-gradient(90deg,var(--yellow),var(--red))}
+  .sigrow{display:flex;justify-content:space-between;margin-top:6px;font-size:12px;font-weight:800}
+  .sigrow .pos{color:var(--green)}.sigrow .neg{color:var(--red)}
+  .sigex{margin-top:10px;font-size:12.5px;color:var(--text-dim);line-height:1.7}
+  .sigex b{color:var(--text);font-weight:700;margin-right:5px}
+
+  /* purpose-weighted insight */
+  .pw-insight{margin-top:14px;padding:14px 16px;border-radius:14px;background:linear-gradient(100deg,rgba(108,140,255,.13),rgba(167,139,250,.09));border:1px solid rgba(108,140,255,.20);font-size:13.5px;line-height:1.65;color:var(--text)}
+  .pw-insight .pw-label{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:7px}
+
+  /* personality */
+  .ptype{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .pcard{padding:16px 14px;border-radius:16px;background:var(--glass);border:1px solid var(--line)}
+  .pcard .picon{width:28px;height:28px;margin-bottom:10px;color:var(--blue)}
+  .pcard.b .picon{color:var(--coral)}
+  .pcard .picon svg{width:100%;height:100%}
+  .pcard .who{font-size:11.5px;font-weight:800;color:var(--blue);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pcard.b .who{color:var(--coral)}
+  .pcard .ptitle{font-size:15px;font-weight:850;line-height:1.25;margin-bottom:7px;letter-spacing:-.01em}
+  .pcard .pdesc{font-size:12px;color:var(--text-dim);line-height:1.55}
+
+  /* metrics */
+  .metric{margin-bottom:18px}.metric:last-child{margin-bottom:0}
+  .metric .mlabel{font-size:13px;color:var(--text-dim);margin-bottom:9px;display:flex;justify-content:space-between;align-items:center}
+  .metric .mpct{font-weight:800;color:var(--text);font-size:13px}
+  .vs{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
+  .vs .who{font-size:11.5px;color:var(--text-faint);margin-bottom:4px}
+  .vs .num{font-size:24px;font-weight:850;letter-spacing:-.02em}
+  .vs .speed{font-size:12px;color:var(--text-dim);margin-top:3px}
+  .vs .left{text-align:right}.vs .right{text-align:left}
+  .vs .mid{font-size:11px;color:var(--text-faint);font-weight:800}
+  .winA .left .num{color:var(--blue)}.winB .right .num{color:var(--coral)}
+  .ratio{height:11px;border-radius:99px;overflow:hidden;display:flex;background:rgba(255,255,255,.07);margin-top:4px}
+  .ratio .a{background:linear-gradient(90deg,var(--blue),#8BAEFF)}
+  .ratio .b{background:linear-gradient(90deg,var(--coral),#FFA5B8)}
+
+  /* word cloud */
+  .cloud{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 14px;padding:8px 4px;line-height:1.3}
+  .cw{font-weight:800;letter-spacing:-.02em;color:var(--text)}
+
+  /* easter egg strip */
+  .egg-strip{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+  .egg{padding:11px 14px;border-radius:12px;background:rgba(167,139,250,.09);border:1px solid rgba(167,139,250,.18);font-size:13px;color:var(--text-dim);line-height:1.5}
+  .egg b{color:var(--lavender)}
+
+  /* "남들이 보면" feature */
+  .outsider{margin-top:14px}
+  .outsider .title{font-size:13px;font-weight:700;color:var(--text-dim);margin-bottom:10px}
+  .out-bars{display:flex;flex-direction:column;gap:6px}
+  .out-row{display:flex;align-items:center;gap:10px;font-size:12.5px}
+  .out-row .out-label{width:80px;color:var(--text-dim);text-align:right;flex:none}
+  .out-row .out-bar{flex:1;height:8px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
+  .out-row .out-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--lavender),var(--blue))}
+  .out-row .out-pct{width:34px;text-align:left;color:var(--text);font-weight:700;font-size:12px}
+
+  /* trend chart */
+  .chartbox{width:100%;overflow:hidden}
+  svg.trend{width:100%;height:auto;display:block}
+  .insight{margin-top:14px;padding:13px 15px;border-radius:13px;background:rgba(108,140,255,.10);border:1px solid rgba(108,140,255,.18);font-size:13.5px;line-height:1.65;color:var(--text)}
+  .insight b{color:#fff}
+  .legend{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:10px;font-size:11.5px;color:var(--text-dim)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:14px;height:3px;border-radius:2px;display:inline-block}
+
+  /* actions */
+  .actions{display:flex;gap:10px;margin-top:20px}
+  .actions .cta{margin-top:0;flex:1}
+  .footnote{text-align:center;color:var(--text-faint);font-size:11.5px;margin-top:22px;line-height:1.6}
+
+  /* share modal */
+  .modal{position:fixed;inset:0;z-index:50;display:none;place-items:center;padding:18px;background:rgba(4,6,20,.80);backdrop-filter:blur(8px)}
+  .modal.show{display:grid;animation:fade .22s ease}
+  .modal-inner{max-width:340px;width:100%;text-align:center}
+  .share-tabs{display:flex;gap:5px;background:rgba(0,0,0,.30);padding:4px;border-radius:12px;margin-bottom:14px}
+  .share-tab{flex:1;border:0;background:transparent;color:var(--text-dim);font:inherit;font-weight:700;font-size:13px;padding:8px;border-radius:9px;cursor:pointer;transition:.18s}
+  .share-tab[aria-selected="true"]{background:var(--glass-b);color:#fff}
+  #shareCanvas{width:100%;max-width:270px;border-radius:18px;box-shadow:0 28px 60px -18px rgba(0,0,0,.9);margin:0 auto 14px;display:block}
+  #shareCanvasKakao{width:100%;max-width:310px;border-radius:18px;box-shadow:0 28px 60px -18px rgba(0,0,0,.9);margin:0 auto 14px;display:none}
+  .modal .row{display:flex;gap:10px}.modal .row .cta,.modal .row .ghost{flex:1;margin-top:0}
+
+  @media(min-width:560px){.temp-wrap{gap:26px}}
+  @media(max-width:380px){.ptype{grid-template-columns:1fr}}
+
+  /* ── 기간비교 / 설렘밀도 ── */
+  .period-cmp{display:flex;align-items:center;gap:20px;margin-top:6px}
+  .period-half{text-align:center;flex:1}
+  .ph-label{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--text-faint);margin-bottom:6px}
+  .ph-temp{font-size:38px;font-weight:850;letter-spacing:-.02em}
+  .ph-hot{color:var(--coral)} .ph-warm{color:var(--yellow)} .ph-cool{color:var(--blue)}
+  .period-mid{text-align:center;color:var(--text-faint);font-size:20px;flex:none}
+  .delta-pill{display:inline-block;font-size:12.5px;font-weight:800;padding:4px 12px;border-radius:99px}
+  .d-up{background:rgba(255,122,144,.15);color:var(--coral)} .d-down{background:rgba(108,140,255,.15);color:var(--blue)} .d-flat{background:rgba(255,255,255,.07);color:var(--text-dim)}
+  .flirt-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .fl-name{width:70px;font-size:12.5px;color:var(--text-dim);text-align:right;flex:none}
+  .flirt-bar{flex:1;height:10px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
+  .flirt-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--lavender),var(--coral))}
+  .fl-pct{width:36px;font-weight:800;font-size:12.5px;color:var(--coral)}
+
+  /* ── 스코어 그리드 (안정감 등) ── */
+  .score-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+  .sc-item{padding:14px 12px;border-radius:14px;background:var(--glass);border:1px solid var(--line);text-align:center}
+  .sc-val{font-size:28px;font-weight:850;letter-spacing:-.02em;margin-bottom:3px}
+  .sc-h{color:var(--green)} .sc-m{color:var(--yellow)} .sc-l{color:var(--red)} .sc-na{color:var(--text-faint);font-size:16px;line-height:2.5}
+  .sc-who{font-size:12px;font-weight:700;color:var(--text-dim);margin-bottom:2px}
+  .sc-sub{font-size:11px;color:var(--text-faint)}
+
+  /* ── 처방전 ── */
+  .rx-list{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+  .rx-item{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:14px}
+  .rx-keep{background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.18)}
+  .rx-watch{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.18)}
+  .rx-try{background:rgba(108,140,255,.08);border:1px solid rgba(108,140,255,.18)}
+  .rx-icon{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:13px;flex:none}
+  .rx-keep .rx-icon{background:rgba(52,211,153,.18)} .rx-watch .rx-icon{background:rgba(251,191,36,.18)} .rx-try .rx-icon{background:rgba(108,140,255,.18)}
+  .rx-tag{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+  .rx-keep .rx-tag{color:var(--green)} .rx-watch .rx-tag{color:var(--yellow)} .rx-try .rx-tag{color:var(--blue)}
+  .rx-text{font-size:13px;color:var(--text);line-height:1.6}
+
+  /* ── 대화 장르 ── */
+  .genre-list{display:flex;flex-direction:column;gap:7px;margin-top:6px}
+  .genre-row{display:flex;align-items:center;gap:10px}
+  .ge-label{width:138px;font-size:12.5px;color:var(--text-dim);flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ge-bar{flex:1;height:8px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
+  .ge-fill{height:100%;border-radius:99px}
+  .ge-pct{width:34px;text-align:right;font-weight:800;font-size:12px;color:var(--text)}
+
+  /* ── 다음 답장 추천 ── */
+  .reply-list{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+  .reply-item{padding:12px 14px;border-radius:14px;background:var(--glass);border:1px solid var(--line)}
+  .ri-mode{font-size:10.5px;font-weight:800;letter-spacing:.07em;color:var(--lavender);margin-bottom:4px;text-transform:uppercase}
+  .ri-text{font-size:14px;color:var(--text);line-height:1.55}
+</style>
+</head>
+<body>
+<div class="aura" aria-hidden="true"></div>
+
+<!-- ===== LANDING ===== -->
+<section class="screen active" id="landing">
+  <div class="wrap">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <defs><linearGradient id="lg0" x1="0" y1="0" x2="48" y2="48">
+          <stop offset="0" stop-color="#6C8CFF"/><stop offset="1" stop-color="#A78BFA"/>
+        </linearGradient></defs>
+        <path d="M9 11h17a5 5 0 0 1 5 5v9a5 5 0 0 1-5 5h-6l-6 5v-5a5 5 0 0 1-5-5v-9a5 5 0 0 1 5-5Z" fill="url(#lg0)" opacity=".28"/>
+        <path d="M39 17H22a5 5 0 0 0-5 5v9a5 5 0 0 0 5 5h6l6 5v-5a5 5 0 0 0 5-5v-9a5 5 0 0 0-5-5Z" fill="url(#lg0)" opacity=".28"/>
+        <path d="M24 13l9 11-9 11-9-11 9-11Z" fill="url(#lg0)"/>
+      </svg>
+      <div class="name"><b>톡</b><span>미러</span></div>
+    </div>
+
+    <div class="hero">
+      <svg class="hero-icon" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+        <defs><linearGradient id="hg" x1="0" y1="0" x2="100" y2="100">
+          <stop offset="0" stop-color="#6C8CFF"/><stop offset=".5" stop-color="#A78BFA"/><stop offset="1" stop-color="#FF7A90"/>
+        </linearGradient></defs>
+        <path d="M50 14 84 74H16L50 14Z" stroke="url(#hg)" stroke-width="2.5" fill="rgba(108,140,255,.08)"/>
+        <path d="M6 50h28" stroke="#fff" stroke-width="2" opacity=".4"/>
+        <path d="M58 46h36" stroke="#6C8CFF" stroke-width="2"/>
+        <path d="M58 52h36" stroke="#A78BFA" stroke-width="2"/>
+        <path d="M58 58h36" stroke="#FF7A90" stroke-width="2"/>
+        <circle cx="50" cy="50" r="3.5" fill="#fff"/>
+      </svg>
+      <h1>대화가 비추는<br><span class="grad">우리의 진짜 온도.</span></h1>
+      <p>카카오톡 대화를 붙여넣거나 .txt 파일로 올리면<br>관계 유형·감정 온도·소통 성향을 3초 만에 비춰드려요.</p>
+    </div>
+
+    <div class="glass panel" id="panel" data-mode="paste">
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" aria-selected="true" data-mode="paste">⚡ 텍스트 붙여넣기</button>
+        <button class="tab" role="tab" aria-selected="false" data-mode="file">📄 파일 업로드</button>
+      </div>
+
+      <div id="pasteArea">
+        <textarea id="ta" placeholder="카톡방 → 대화 길게 누르기 → 복사 → 여기에 붙여넣기
+
+[지민] [오후 10:30] 자니?
+[하준] [오후 10:32] 아니 안 자ㅋㅋ 왜
+[지민] [오후 10:32] 그냥 생각나서~"></textarea>
+        <p class="hint hint-paste">최소 20줄 이상이면 분석이 더 정확해요.</p>
+      </div>
+
+      <div id="fileArea" hidden>
+        <label class="drop" id="drop" tabindex="0" role="button">
+          <b>.txt 파일을 여기에 끌어다 놓기</b>
+          <small>카톡 → 채팅방 우측 상단 메뉴 → 대화 내보내기 → 텍스트만 보내기</small>
+          <input type="file" id="file" accept=".txt,text/plain" hidden />
+        </label>
+        <p id="fname"></p>
+        <p class="hint hint-file">iOS / 안드로이드 모두 지원해요. UTF-8, EUC-KR 인코딩 자동 감지.</p>
+      </div>
+
+      <div class="err" id="err"></div>
+      <button class="cta" id="go" disabled>다음 단계로 →</button>
+      <button class="ghost" id="demo" style="width:100%;margin-top:10px">샘플 대화로 먼저 구경하기</button>
+    </div>
+
+    <div class="privacy">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2 4 6v6c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10V6l-8-4Z" stroke="#6C8CFF" stroke-width="1.6"/><path d="m9 12 2 2 4-4" stroke="#6C8CFF" stroke-width="1.6" stroke-linecap="round"/></svg>
+      모든 분석은 브라우저 안에서만 일어나요. 대화는 어디에도 전송되지 않습니다.
+    </div>
+  </div>
+</section>
+
+<!-- ===== PURPOSE SELECTION ===== -->
+<section class="screen" id="purpose-screen">
+  <div class="wrap">
+    <div class="brand" style="justify-content:flex-start;margin-bottom:20px">
+      <button class="back" id="backToLanding">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        뒤로
+      </button>
+    </div>
+
+    <p class="purpose-q">어떤 기준으로<br>비춰드릴까요?</p>
+    <p class="purpose-sub">선택하신 목적에 따라 분석 가중치가 달라져요.</p>
+
+    <div class="purpose-list" id="purposeList">
+      <button class="pc" data-purpose="interest" aria-selected="false">
+        <span class="pi">💘</span>
+        <div><div class="pt">이 사람이 나한테 관심 있는지 궁금해요</div><div class="pd">질문·대화 확장·답장 패턴 중심 분석</div></div>
+      </button>
+      <button class="pc" data-purpose="cooling" aria-selected="false">
+        <span class="pi">🌡️</span>
+        <div><div class="pt">요즘 관계가 식었는지 알고 싶어요</div><div class="pd">기간별 온도 변화·애정 표현 감소 분석</div></div>
+      </button>
+      <button class="pc" data-purpose="effort" aria-selected="false">
+        <span class="pi">⚖️</span>
+        <div><div class="pt">나만 너무 노력 중인지 알고 싶어요</div><div class="pd">선톡·발화량·대화 복구 균형 분석</div></div>
+      </button>
+      <button class="pc" data-purpose="conflict" aria-selected="false">
+        <span class="pi">🌀</span>
+        <div><div class="pt">싸움/오해 패턴을 보고 싶어요</div><div class="pd">부정어·회피·화제 전환 패턴 분석</div></div>
+      </button>
+      <button class="pc" data-purpose="style" aria-selected="false">
+        <span class="pi">🪞</span>
+        <div><div class="pt">내 말투 유형이 궁금해요</div><div class="pd">쿠션어·감정 표현·질문 방식 중심 분석</div></div>
+      </button>
+    </div>
+
+    <button class="cta" id="startAnalysis" disabled>이 기준으로 분석하기</button>
+  </div>
+</section>
+
+<!-- ===== LOADING ===== -->
+<section id="loading">
+  <div>
+    <svg class="load-icon" viewBox="0 0 88 88" fill="none" aria-hidden="true">
+      <defs><linearGradient id="lg2" x1="0" y1="0" x2="88" y2="88">
+        <stop offset="0" stop-color="#6C8CFF"/><stop offset="1" stop-color="#A78BFA"/>
+      </linearGradient></defs>
+      <path d="M44 12l30 55H14L44 12Z" stroke="url(#lg2)" stroke-width="2.5" fill="none">
+        <animate attributeName="opacity" values="0.4;1;0.4" dur="1.8s" repeatCount="indefinite"/>
+      </path>
+      <g>
+        <path d="M52 41h26" stroke="#6C8CFF" stroke-width="2.5"/>
+        <path d="M52 47h22" stroke="#A78BFA" stroke-width="2.5"/>
+        <path d="M52 53h18" stroke="#FF7A90" stroke-width="2.5"/>
+        <animateTransform attributeName="transform" type="translate" values="0 0;5 0;0 0" dur="1.6s" repeatCount="indefinite"/>
+      </g>
+    </svg>
+    <div class="load-title">대화를 거울에 비추는 중…</div>
+    <div class="load-step" id="loadstep">메시지를 정리하고 있어요</div>
+    <div class="bar"><i id="barfill"></i></div>
+  </div>
+</section>
+
+<!-- ===== REPORT ===== -->
+<section class="screen" id="report">
+  <div class="wrap">
+    <div class="rep-head">
+      <div class="eyebrow">우리 관계의 현주소</div>
+      <div class="badge" id="relBadge">—</div>
+      <p class="relnote" id="relNote"></p>
+      <div id="purposeTag"></div>
+      <div class="subnames" id="subnames"></div>
+      <div class="modeswitch" role="tablist" aria-label="결과 말투">
+        <button class="mode" data-mode="fun" aria-selected="true">😜 장난 모드</button>
+        <button class="mode" data-mode="warm" aria-selected="false">🫶 다정 모드</button>
+      </div>
+    </div>
+
+    <div class="grid" id="cards"></div>
+
+    <div class="actions">
+      <button class="cta" id="share">💌 결과 공유하기</button>
+      <button class="ghost" id="restart">다시 분석</button>
+    </div>
+    <div class="footnote">
+      톡미러는 룰베이스 통계로 관계의 '경향'을 비추는 재미 서비스예요.<br>
+      대화 패턴을 관찰할 뿐, 상대의 마음을 단정하지 않습니다 :)
+    </div>
+  </div>
+</section>
+
+<!-- ===== SHARE MODAL ===== -->
+<div class="modal" id="modal">
+  <div class="modal-inner">
+    <div class="share-tabs" role="tablist">
+      <button class="share-tab" role="tab" aria-selected="true" data-share="insta">📱 인스타 스토리</button>
+      <button class="share-tab" role="tab" aria-selected="false" data-share="kakao">💬 카카오 공유</button>
+    </div>
+    <canvas id="shareCanvas" width="540" height="960"></canvas>
+    <canvas id="shareCanvasKakao" width="800" height="800"></canvas>
+    <div class="row">
+      <button class="cta" id="dl">이미지 저장</button>
+      <button class="ghost" id="closeModal">닫기</button>
+    </div>
+    <p id="shareNote" style="margin-top:10px;color:var(--text-faint);font-size:11px">인스타 스토리(9:16) 비율이에요</p>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ── 감정 사전 ── */
+const LEX={
+  "좋아":1.2,"좋다":1.2,"좋은":1,"좋네":1,"좋았":1.2,"좋겠":.8,"조아":1.2,"존좋":1.6,
+  "사랑":1.8,"행복":1.6,"고마":1.2,"감사":1,"기뻐":1.4,"기쁘":1.4,"기쁨":1.4,
+  "최고":1.5,"대박":1.2,"짱":1.3,"멋지":1.2,"멋있":1.2,"예뻐":1.3,"예쁘":1.3,"이뻐":1.3,"귀여":1.3,
+  "설레":1.6,"두근":1.4,"보고싶":1.5,"보고파":1.5,"웃겨":1.1,"웃기":1,"재밌":1.3,"재미있":1.3,
+  "다행":.9,"든든":1,"힐링":1.3,"뿌듯":1.3,"신나":1.4,"최애":1.5,"완벽":1.2,"행복하":1.6,
+  "화이팅":1,"파이팅":1,"응원":1,"축하":1.2,"수고":.7,"잘했":1.2,"편안":1,
+  "♥":1.6,"❤":1.6,"💕":1.6,"💗":1.5,"💜":1.4,"😍":1.6,"🥰":1.6,"😘":1.6,"😊":1,"😆":1.1,"😄":1,"🤍":1.2,"💛":1.2,
+  "싫어":-1.5,"싫다":-1.5,"싫":-1.2,"미워":-1.5,"짜증":-1.6,"화나":-1.6,"화남":-1.5,
+  "빡쳐":-1.8,"빡침":-1.8,"슬퍼":-1.5,"슬프":-1.5,"우울":-1.6,"힘들":-1.3,"힘드":-1.3,"별로":-1.3,
+  "아파":-1.1,"외로":-1.5,"답답":-1.4,"실망":-1.6,"서운":-1.4,"속상":-1.5,"최악":-1.8,
+  "귀찮":-1.2,"미안":-.6,"죄송":-.6,"지쳐":-1.4,"지친":-1.4,"피곤":-1,"스트레스":-1.4,
+  "불안":-1.3,"걱정":-1,"무서":-1.1,"두려":-1.2,"후회":-1.3,"찝찝":-1,"애매":-.8,"싸우":-1.6,"다퉜":-1.6,
+  "됐어":-1,"됐고":-1.1,"관심없":-1.5,"노잼":-1.3,"노답":-1.4,"극혐":-2,
+  "괜찮":.6,"고생많":1,
+  "😢":-1.5,"😭":-1.5,"😞":-1.4,"😔":-1.4,"😡":-1.8,"🤬":-2,"💔":-1.8,"🙄":-1,"😒":-1.2
+};
+const LEXARR=Object.entries(LEX).sort((a,b)=>b[0].length-a[0].length);
+const NEGATORS=/(?:^|\s)(안|못)(?:\s|$|[가-힣])|않|없|아니|말고|싶지/;
+const INTENS=/(너무|넘|완전|진짜|레알|개|존나|졸라|엄청|정말|매우|너무너무|굉장)/;
+const ROMANTIC=["보고싶","보고파","자기야","자기","애기야","여보","뽀뽀","데이트","사랑해","좋아해","설레","두근","사겨","사귀","애인","연애","결혼","손잡","안아","잘자","굿밤","좋은꿈","자기얌","💕","💜","😘","🥰","❤"];
+const STOP=new Set(("그 저 이 것 거 게 수 좀 잘 더 또 곧 막 안 못 왜 응 음 아 어 헐 와 오 네 넵 넹 ㅇㅇ ㄴㄴ ㅇ ㄴ ㅋ ㅎ ㅠ ㅜ " +
+  "나 너 내 우리 저희 그냥 진짜 정말 너무 완전 약간 조금 많이 되게 엄청 굉장 " +
+  "그래 그래서 그러면 그치 근데 그런데 그리고 하지만 그게 이게 저게 " +
+  "뭐 머 뭔 뭔가 무슨 어떤 어디 언제 누구 " +
+  "지금 오늘 내일 어제 그때 이때 그거 이거 저거 일단 그럼 그건 " +
+  "거기 여기 저기 우와 아하 그래도 아니 맞아 그러니까 어차피 암튼 아무튼 역시 " +
+  "이미 아직 벌써 방금 인제 이제 아까 다시 또한 " +
+  "그리 저렇 이렇 그렇 " +
+  "저는 저도 저를 저의 저한테 저에게 제가 제 저 " +
+  "나는 나도 나를 나한테 나에게 난 내가 넌 너는 너도 네가 니가 우린 " +
+  "걔 얘 쟤 그는 그녀 자기 본인 " +
+  "이번 다음 이런 그런 저런 이렇게 그렇게 저렇게 " +
+  "같은 같이 같아 같다 처럼 통해 위해 대해 관련 정도 때문 " +
+  "그래가지고 거의 막상 워낙 " +
+  "사진 이모티콘 동영상 음성 파일 삭제된 사진을 이모티콘을 " +
+  "https http www com net kr co 카톡 ㅋㅋ ㅎㅎ ㅋㅋㅋ ㅎㅎㅎ ㅠㅠ ㅜㅜ " +
+  "뭐야 그렇지 그쵸 그치요 그니까 근데요 저도요 맞아요 아니요 아니에요 " +
+  "그러게 그러게요 그렇군요 그렇구나 어머 어머나 오마이 대에박 " +
+  "하하 호호 히히 흐흐 크크 " +
+  "됩니다 합니다 했습니다 이에요 예요 네요 군요 " +
+  "할게 할게요 해줘 해줘요 해요 하자 하자요 " +
+  "것같 것같아 것같은데 것같아요 " +
+  "어떻게 왜냐면 왜냐하면 어쩌면 어쩌다 그러다가 그러다 " +
+  "뭔가요 뭐예요 뭐에요 어떤거 어떤게 " +
+  "원래 사실 근본 솔직히 솔직 딱히 도대체 " +
+  "뒤 앞 위 밖 안에 위에 아래 옆 사이 " +
+  "때 번 개 가지 종류 부분 방법 이유 경우 " +
+  "것이 것은 것을 것에 것도 것만 것과 " +
+  "수도 수는 수가 수를 수에 " +
+  "제발 그냥요 좀요 잠깐 잠만 잠시 " +
+  "일이 이일 그일 그런일 이런일 " +
+  "ㅎㄷㄷ ㄷㄷ ㄱㄱ ㅂㅂ ㅇㅋ ㄳ ㄷㄱ ㅈㅅ ㅊㅋ").split(/\s+/));
+const URLISH=/(https?:|www\.|\.com|\.net|\.kr|\.co|youtu|naver|insta|http)/i;
+const JOSA=["으로서","으로써","이라는","에서는","에게서","한테서","이라고","으로","에서","에게","한테","께서","이랑","라고","처럼","보다","까지","부터","조차","마저","대로","이나","으면","면서","지만","는데","은데","니까","거든","잖아","어야","아야","았어","었어","겠어","어요","아요","에요","예요","세요","해서","어서","아서","하고","하는","했어","한다","는다","이다","이야","이라","으니","라서","니다","들이","들을","들은","들","님","랑","은","는","이","가","을","를","의","에","과","와","로","도","만","고","서"];
+function stem(w){ for(const s of JOSA){ if(w.length>s.length&&w.endsWith(s)){ const r=w.slice(0,-s.length); if(r.length>=2) return r; } } return w; }
+
+const SPEED_FUN=[[1,"⚡ 빛의 속도"],[3,"📶 LTE급"],[10,"🚶 산책 다녀온 속도"],[30,"🍜 라면 끓이는 속도"],[60,"😴 낮잠 자는 속도"],[180,"🐢 거북이 속도"],[Infinity,"🏯 조선시대 파발 속도"]];
+const SPEED_WARM=[[1,"💨 바로바로 답하는 편"],[3,"🙂 금방 답하는 편"],[10,"🍵 여유롭게 답하는 편"],[30,"🌙 생각하고 답하는 편"],[60,"🛌 천천히 답하는 편"],[180,"🌳 느긋한 편"],[Infinity,"🕊️ 자기 속도가 있는 편"]];
+function speedLabel(min,mode){ const T=mode==="warm"?SPEED_WARM:SPEED_FUN; for(const [lim,l] of T){ if(min<lim) return l; } }
+
+function sentimentOf(text){
+  let pos=0,neg=0;
+  const clauses=text.split(/[.!?~…\n。·,]+/).map(c=>c.trim()).filter(Boolean);
+  for(const c of clauses){
+    let cp=0,cn=0;
+    for(const [root,w] of LEXARR){ if(c.includes(root)){ if(w>0)cp+=w; else cn+=-w; } }
+    if(cp===0&&cn===0) continue;
+    const inten=INTENS.test(c)?1.4:1;
+    if(NEGATORS.test(c)){ neg+=(cp+cn)*inten; } else { pos+=cp*inten; neg+=cn*inten; }
+  }
+  pos+=laughCount(text)*0.8; neg+=cryCount(text)*0.8;
+  return {pos,neg};
+}
+function romanticScore(text){ let s=0; for(const r of ROMANTIC){ if(text.includes(r)) s++; } return s; }
+function laughCount(t){ return (t.match(/[ㅋㅎ]{2,}/g)||[]).length; }
+function cryCount(t){ return (t.match(/[ㅠㅜ]{1,}/g)||[]).length; }
+
+/* ── 파서 ── */
+const RE={
+  pc:/^\[([^\]]{1,40})\]\s*\[(오전|오후)\s*(\d{1,2}):(\d{2})\]\s?(.*)$/,
+  mob:/^(\d{4})[년.\s]+(\d{1,2})[월.\s]+(\d{1,2})[일.]?\s*(?:오전|오후)?\s*(\d{1,2}):(\d{2})(?::\d{2})?,?\s+(.+?)\s*:\s?(.*)$/,
+  mobAP:/(오전|오후)/,
+  pcDate:/(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/
+};
+function to24(ap,h){ h=+h; if(ap==="오후"&&h!==12)h+=12; if(ap==="오전"&&h===12)h=0; return h; }
+
+function parseChat(raw){
+  const lines=raw.replace(/\r/g,"").split("\n");
+  const msgs=[]; let curDate=null,hasDate=false,last=null;
+  for(let line of lines){
+    if(!line.trim()) continue;
+    let mb=line.match(RE.mob);
+    if(mb){ const ap=(line.match(RE.mobAP)||[])[0]||null; let h=+mb[4]; if(ap)h=to24(ap,h); hasDate=true;
+      const t=new Date(+mb[1],+mb[2]-1,+mb[3],h,+mb[5]); const m={who:mb[6].trim(),text:mb[7]||"",t,valid:true}; msgs.push(m); last=m; continue; }
+    let dm=line.match(RE.pcDate);
+    if(dm&&/^[-\s]*\d{4}년/.test(line.trim())&&!/\d{1,2}:\d{2}/.test(line)&&!RE.pc.test(line)){
+      curDate={y:+dm[1],m:+dm[2],d:+dm[3]}; hasDate=true; last=null; continue; }
+    let pm=line.match(RE.pc);
+    if(pm){ const h=to24(pm[2],pm[3]); let t=null;
+      if(curDate)t=new Date(curDate.y,curDate.m-1,curDate.d,h,+pm[4]); else t=new Date(2000,0,1,h,+pm[4]);
+      const m={who:pm[1].trim(),text:pm[5]||"",t,valid:true,dateless:!curDate}; msgs.push(m); last=m; continue; }
+    if(/(님과 카카오톡 대화|저장한 날짜|^-{3,}|님이 (들어왔|나갔)|채팅방 관리자|운영정책|메시지입니다$)/.test(line.trim())) continue;
+    if(last)last.text+="\n"+line;
+  }
+  return {msgs,hasDate};
+}
+
+/* ── 분석 ── */
+const reEmojiG=/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}❤⭐]/gu;
+function countHits(text,list){ let n=0; for(const w of list)if(text.includes(w))n++; return n; }
+
+function analyze(parsed){
+  const {msgs,hasDate}=parsed;
+  const real=msgs.filter(m=>m.who&&m.text!=null);
+  if(real.length<4) throw new Error("few");
+  const vol={}; real.forEach(m=>{vol[m.who]=(vol[m.who]||0)+1;});
+  const speakers=Object.keys(vol).sort((a,b)=>vol[b]-vol[a]);
+  if(speakers.length<2) throw new Error("one");
+  const [A,B]=speakers;
+  const isGroup=speakers.length>2;
+  const conv=real.filter(m=>m.who===A||m.who===B);
+  const P={};
+  for(const who of [A,B]){
+    P[who]={who,msgs:0,chars:0,emoji:0,laugh:0,cry:0,q:0,pos:0,neg:0,period:0,cushion:0,react:0,romantic:0,lens:[],latencies:[],initiations:0};
+  }
+  const cushionW=["혹시","괜찮으면","괜찮아","바쁘면","미안한데","실례","해도 될까","될까요","부탁","천천히","편할 때"];
+  const reactW=["헐","대박","미쳤","오졌","ㄹㅇ","레전드","진짜?","실화","와우","개쩐","쩐다","말도 안"];
+  let totalPos=0,totalNeg=0;
+  for(let i=0;i<conv.length;i++){
+    const m=conv[i],p=P[m.who],t=m.text;
+    p.msgs++; p.chars+=t.length; p.lens.push(t.length);
+    const em=(t.match(reEmojiG)||[]).length; p.emoji+=em;
+    p.laugh+=laughCount(t); p.cry+=cryCount(t);
+    p.q+=(t.match(/\?|？/g)||[]).length;
+    if(/[.]$/.test(t.trim()))p.period++;
+    const sm=sentimentOf(t); p.pos+=sm.pos; p.neg+=sm.neg; totalPos+=sm.pos; totalNeg+=sm.neg;
+    p.cushion+=countHits(t,cushionW); p.react+=countHits(t,reactW); p.romantic+=romanticScore(t);
+    if(i>0){
+      const prev=conv[i-1]; let gap=(m.t-prev.t)/60000;
+      if(!hasDate&&gap<0)gap+=1440;
+      if(prev.who!==m.who&&gap>=0.5&&gap<=720)p.latencies.push(gap);
+      if(gap>180||(hasDate&&prev.t.getDate()!==m.t.getDate()))p.initiations++;
+    } else p.initiations++;
+  }
+  for(const who of [A,B]){
+    const p=P[who];
+    p.avgLen=p.chars/Math.max(1,p.msgs);
+    p.emojiRate=(p.emoji+p.laugh)/Math.max(1,p.msgs);
+    p.medLat=p.latencies.length>=3?median(p.latencies):null;
+    p.avgLat=p.latencies.length?p.latencies.reduce((a,b)=>a+b,0)/p.latencies.length:null;
+  }
+  const totalMsg=P[A].msgs+P[B].msgs;
+  const totalInit=P[A].initiations+P[B].initiations||1;
+  const ratio=totalPos/Math.max(1,totalPos+totalNeg);
+  let temp=Math.round(42+ratio*48); temp=Math.max(30,Math.min(97,temp));
+  let formalHard=0;
+  conv.forEach(m=>{if(/(습니다|ㅂ니다|십시오|시죠|드립니다|드려요|십니다|드릴게요|드리겠|하십|부탁)/.test(m.text))formalHard++;});
+  const posSig={},negSig={}; let laughT=0,cryT=0;
+  conv.forEach(m=>{
+    laughT+=laughCount(m.text); cryT+=cryCount(m.text);
+    for(const [root,w] of LEXARR)if(root.length>=2&&/[가-힣]/.test(root)&&m.text.includes(root)){const o=w>0?posSig:negSig;o[root]=(o[root]||0)+1;}
+  });
+  const topSig=o=>Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,3).map(e=>e[0]);
+  const posSignals=topSig(posSig); if(laughT>=3)posSignals.unshift("ㅎㅎ/ㅋㅋ");
+  const negSignals=topSig(negSig); if(cryT>=2)negSignals.unshift("ㅠㅠ");
+  return {A,B,P,conv,hasDate,isGroup,speakers,temp,totalMsg,totalInit,
+    formalHard:formalHard/Math.max(1,conv.length),
+    posPct:Math.round(ratio*100),posSignals:posSignals.slice(0,4),negSignals:negSignals.slice(0,4),
+    relRomantic:(P[A].romantic+P[B].romantic)/Math.max(1,totalMsg)};
+}
+function median(a){ if(!a.length)return null; const s=[...a].sort((x,y)=>x-y); const m=s.length>>1; return s.length%2?s[m]:(s[m-1]+s[m])/2; }
+
+/* ── 성향 분류 (8가지) ── */
+function personalityOf(p){
+  const qr=p.q/Math.max(1,p.msgs), lr=p.laugh/Math.max(1,p.msgs);
+  const s={
+    react:p.emojiRate*2+p.react*0.5+lr*3,
+    fact:(p.avgLen>16?2:0)+p.period/Math.max(1,p.msgs)*3+(p.emojiRate<0.3?1.5:0),
+    care:p.cushion*0.8+(p.pos/Math.max(1,p.msgs))*2+qr*1.5,
+    cool:(p.avgLen<8?2.5:0)+(p.emojiRate<0.15?1.5:0),
+    tension:lr*4+(p.msgs>0?p.emojiRate:0),
+    longExplain:(p.avgLen>28?3.5:p.avgLen>20?1.5:0)+p.period/Math.max(1,p.msgs)*4,
+    socialEngine:p.initiations/Math.max(1,p.msgs)*5+qr*3+p.cushion*0.5,
+    pretendCool:(p.avgLen<10?2:0)+p.romantic/Math.max(1,p.msgs)*7+p.emojiRate*0.2
+  };
+  const top=Object.keys(s).sort((a,b)=>s[b]-s[a])[0];
+  const I=(d)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  const M={
+    react:["감정 풍부한 리액션봇","이모티콘과 감탄사로 대화에 색을 입히는 분위기 메이커",I('<path d="M12 21s-7-4.6-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.4-7 10-7 10Z"/>')],
+    fact:["신중한 팩트체크형","문장이 길고 마침표가 또박또박, 할 말을 정확히 전하는 스타일",I('<circle cx="11" cy="11" r="6"/><path d="m20 20-3.5-3.5"/><path d="m9 11 1.5 1.5L14 9"/>')],
+    care:["다정다감 케어형","상대를 먼저 챙기고 질문으로 마음을 살피는 따뜻한 사람",I('<path d="M7 11V7a2 2 0 0 1 4 0v4"/><path d="M11 11V5.5a2 2 0 0 1 4 0V11"/><path d="M15 11V8a2 2 0 0 1 4 0v6a6 6 0 0 1-6 6h-2a6 6 0 0 1-5.7-4.1L4 14"/>')],
+    cool:["쿨한 단답 미니멀리스트","짧고 담백하게, 핵심만 던지는 타입",I('<path d="M4 9h16"/><path d="M4 15h10"/>')],
+    tension:["텐션 폭발 분위기메이커","ㅋㅋ가 끊이지 않는, 대화 에너지를 끌어올리는 사람",I('<path d="m13 2-9 12h7l-2 8 9-12h-7l2-8Z"/>')],
+    longExplain:["장문 해명러","짧은 오해도 2000자로 설명하는, 진심을 끝까지 전달하는 타입",I('<path d="M4 6h16M4 10h16M4 14h10M4 18h6"/><circle cx="18" cy="17" r="3"/>')],
+    socialEngine:["관계 엔진형","먼저 연락하고 질문으로 대화를 이끄는, 관계의 주도자",I('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>')],
+    pretendCool:["쿨한 척 과몰입러","단답을 치고 있지만 사실 마음이 넘치는, 절제미 넘치는 감성파",I('<path d="M12 2 15.09 8.26 22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/>')]
+  };
+  return {key:top,title:M[top][0],desc:M[top][1],icon:M[top][2]};
+}
+
+/* ── 관계 유형 (스펙 Section 10.1 기반) ── */
+function relationshipType(R){
+  const {P,A,B,temp,totalMsg,relRomantic,formalHard}=R;
+  const hint=typeof REL_HINT!=="undefined"?REL_HINT:"auto";
+  const balance=Math.min(P[A].msgs,P[B].msgs)/Math.max(P[A].msgs,P[B].msgs);
+  const initBal=Math.min(P[A].initiations,P[B].initiations)/Math.max(1,Math.max(P[A].initiations,P[B].initiations));
+  const romantic=relRomantic>0.04||hint==="couple"||hint==="crush";
+  const businessy=(formalHard>0.3&&relRomantic<0.02&&(P[A].emojiRate+P[B].emojiRate)/2<0.28)||(hint==="work"&&relRomantic<0.04);
+  const lean=balance<0.55||initBal<0.4;
+  const leader=(P[A].msgs+P[A].initiations)>(P[B].msgs+P[B].initiations)?A:B;
+  const laughter=(P[A].laugh+P[B].laugh)/Math.max(1,totalMsg);
+
+  if(businessy)
+    return {badge:"🤝 신뢰가 쌓인 비즈니스 파트너",emoji:"🤝",
+      note:"감정 표현은 절제돼 있지만, 핵심을 정확히 주고받는 프로페셔널한 사이예요."};
+  if(romantic&&temp>=75&&balance>0.65)
+    return {badge:"💞 안정기에 접어든 연인",emoji:"💞",
+      note:"따뜻한 호칭과 높은 감정 온도가 오래 함께한 편안함을 보여줘요."};
+  if(romantic&&temp>=68&&lean)
+    return {badge:"💗 한 사람이 조금 더 마음을 내는 중",emoji:"💗",
+      note:`${trim(leader)}님 쪽 발화와 선톡이 조금 더 많아요. 기운 시소지만, 마음의 방향은 직접 확인하는 게 제일 정확해요.`};
+  if(romantic&&temp>=65)
+    return {badge:"🔥 불꽃 튀는 썸의 한가운데",emoji:"🔥",
+      note:"설렘 키워드와 빠른 핑퐁이 오가는, 가장 짜릿한 구간이에요."};
+  if(romantic&&temp>=55&&balance<0.6)
+    return {badge:"🚣 한쪽이 노 젓는 카누형 관계",emoji:"🚣",
+      note:"대화를 이어가는 노력이 한쪽에 쏠려 있어요. 상대의 반응을 조금 더 지켜봐도 좋겠어요."};
+  if(romantic&&temp>=52)
+    return {badge:"🌫️ 서로 눈치만 보는 안개 낀 썸",emoji:"🌫️",
+      note:"대화는 끊기지 않지만 방향이 애매해요. 가벼운 만남 제안으로 관계를 확인해볼 때예요."};
+  if(romantic&&temp<52)
+    return {badge:"❄️ 천천히 달궈지는 저온 썸",emoji:"❄️",
+      note:"온도는 낮지만 꺼지지는 않은 상태예요. 일상 공유로 온도를 서서히 올려보세요."};
+  if(laughter>0.12&&balance>0.58&&temp>=66)
+    return {badge:"😆 텐션 잘 맞는 편한 단짝",emoji:"😆",
+      note:"ㅋㅋ가 끊이지 않고 주고받는 양도 비슷해요. 케미가 좋은 친구 사이!"};
+  if(temp<52)
+    return {badge:"🌧️ 살짝 거리감이 생긴 구간",emoji:"🌧️",
+      note:"긍정 신호가 다소 줄어든 시기예요. 가벼운 안부 한 마디가 온도를 올릴 수 있어요."};
+  return {badge:"🌤️ 잔잔하게 흐르는 사이",emoji:"🌤️",
+    note:"큰 기복 없이 편안하게 이어지는 관계예요."};
+}
+function trim(n){ return n.length>6?n.slice(0,6)+"…":n; }
+
+/* ── 목적별 가중 인사이트 ── */
+function purposeInsight(R,purpose){
+  const {P,A,B,totalMsg}=R;
+  const initApct=Math.round(P[A].initiations/(R.totalInit)*100);
+  const qRatioA=P[A].q/Math.max(1,P[A].msgs), qRatioB=P[B].q/Math.max(1,P[B].msgs);
+  const la=P[A].medLat, lb=P[B].medLat;
+
+  const labels={interest:"💘 관심 신호 분석",cooling:"🌡️ 온도 변화 분석",effort:"⚖️ 노력 균형 분석",conflict:"🌀 갈등 패턴 분석",style:"🪞 내 말투 분석"};
+  const label=labels[purpose]||"";
+
+  let text="";
+  if(purpose==="interest"){
+    const partnerQ=P[B].q/Math.max(1,P[B].msgs);
+    const partnerRomantic=P[B].romantic;
+    if(partnerQ>0.15&&partnerRomantic>2)
+      text=`<b>${trim(B)}</b>의 질문 비율이 높고 감정적 표현도 자주 관찰돼요. 대화상 관심 신호가 다수 보입니다.`;
+    else if(partnerQ>0.08)
+      text=`<b>${trim(B)}</b>는 질문을 곧잘 돌려줘요. 확인 질문과 감정 질문 중 어느 쪽인지 보면 더 정확해요.`;
+    else
+      text=`<b>${trim(B)}</b>의 질문 비율이 낮은 편이에요. 대화를 확장하려는 신호가 아직 약합니다.`;
+  } else if(purpose==="cooling"){
+    const trend=R.temp>=65?"따뜻한 편이에요":R.temp>=52?"미지근한 상태예요":"다소 식은 구간이에요";
+    text=`현재 감정 온도는 <b>${R.temp}°C</b>로 ${trend}. 초반과 최근 대화량 변화가 있다면 주의 깊게 보세요.`;
+  } else if(purpose==="effort"){
+    const msgApct=Math.round(P[A].msgs/R.totalMsg*100);
+    const imbalance=Math.abs(msgApct-50);
+    if(imbalance>20)
+      text=`발화량 비율이 <b>${msgApct} : ${100-msgApct}</b>로 꽤 기울어져 있어요. 선톡 비율 ${initApct}%도 같이 확인해보세요.`;
+    else
+      text=`발화량 비율은 <b>${msgApct} : ${100-msgApct}</b>으로 비교적 균형 잡혀 있어요.`;
+  } else if(purpose==="conflict"){
+    const negRatio=100-R.posPct;
+    if(negRatio>40)
+      text=`부정 감정 비율이 <b>${negRatio}%</b>로 높아요. 반복되는 오해나 갈등 패턴이 있는지 살펴볼 필요가 있어요.`;
+    else
+      text=`부정 감정 비율은 <b>${negRatio}%</b>로 낮은 편이에요. 갈등 표현은 많지 않아 보여요.`;
+  } else if(purpose==="style"){
+    const pa=personalityOf(P[A]);
+    text=`<b>${trim(A)}</b>의 말투 유형은 '<b>${pa.title}</b>'이에요. ${pa.desc}`;
+  }
+  return {label,text};
+}
+
+/* ── "남들이 보면 무슨 사이?" ── */
+function outsiderView(R){
+  const {temp,relRomantic,formalHard,P,A,B}=R;
+  const laughter=(P[A].laugh+P[B].laugh)/Math.max(1,R.totalMsg);
+  let crush=0, lover=0, friend=0, coworker=0;
+  crush=Math.round(relRomantic*400+temp*0.4);
+  lover=Math.round(relRomantic*600+(R.P[A].romantic+R.P[B].romantic)*5);
+  friend=Math.round(laughter*300+(100-Math.abs(Math.round(P[A].msgs/R.totalMsg*100)-50)));
+  coworker=Math.round(formalHard*500+20);
+  const total=Math.max(1,crush+lover+friend+coworker);
+  const pct={썸:Math.round(crush/total*100), 연인:Math.round(lover/total*100), 친구:Math.round(friend/total*100), 직장동료:Math.round(coworker/total*100)};
+  const diff=100-Object.values(pct).reduce((a,b)=>a+b,0);
+  const maxKey=Object.keys(pct).reduce((a,b)=>pct[a]>pct[b]?a:b);
+  pct[maxKey]+=diff;
+  return Object.entries(pct).sort((a,b)=>b[1]-a[1]);
+}
+
+/* ── 이스터에그 ── */
+function easterEggs(R){
+  const {P,A,B,totalMsg}=R;
+  const eggs=[];
+  const laughter=(P[A].laugh+P[B].laugh)/Math.max(1,totalMsg);
+  const initApct=Math.round(P[A].initiations/R.totalInit*100);
+  const la=P[A].medLat, lb=P[B].medLat;
+  if(laughter>0.18) eggs.push("두 분의 대화창에 웃음이 꽤 많이 출몰했어요. 🎭");
+  if(P[A].q/Math.max(1,P[A].msgs)>0.25) eggs.push(`${trim(A)}님이 거의 인터뷰어로 활약 중입니다. 📋`);
+  else if(P[B].q/Math.max(1,P[B].msgs)>0.25) eggs.push(`${trim(B)}님이 거의 인터뷰어로 활약 중입니다. 📋`);
+  if(la!=null&&lb!=null&&Math.abs(la-lb)>40) eggs.push("한쪽의 시간은 LTE, 한쪽의 시간은 와이파이 끊긴 카페예요. 📡");
+  if((P[A].avgLen+P[B].avgLen)/2<5) eggs.push("문장들이 다이어트 중입니다. 🥗");
+  if(initApct>75) eggs.push(`${trim(A)}님이 거의 항상 먼저 문을 두드리고 있어요. 🚪`);
+  else if(initApct<25) eggs.push(`${trim(B)}님이 거의 항상 먼저 문을 두드리고 있어요. 🚪`);
+  return eggs.slice(0,3);
+}
+
+/* ── 기간 비교 ── */
+function periodComparison(R){
+  const {conv}=R;
+  const half=Math.floor(conv.length/2);
+  function tempOf(msgs){
+    let pos=0,neg=0;
+    msgs.forEach(m=>{const s=sentimentOf(m.text);pos+=s.pos;neg+=s.neg;});
+    const ratio=pos/Math.max(1,pos+neg);
+    return Math.max(30,Math.min(97,Math.round(42+ratio*48)));
+  }
+  const t1=tempOf(conv.slice(0,half)),t2=tempOf(conv.slice(half));
+  return{t1,t2,delta:t2-t1};
+}
+
+/* ── 설렘 밀도 ── */
+function flirtingDensity(R){
+  const {P,A,B}=R;
+  function score(p){
+    const rr=p.romantic/Math.max(1,p.msgs);
+    const qr=p.q/Math.max(1,p.msgs);
+    const lr=p.laugh/Math.max(1,p.msgs);
+    return Math.min(100,Math.round(rr*100+p.emojiRate*20+qr*30+lr*10));
+  }
+  return{A:score(P[A]),B:score(P[B])};
+}
+
+/* ── 안정감 지수 ── */
+function stabilityScore(R){
+  const {P,A,B}=R;
+  function stab(p){
+    const lats=p.latencies;
+    if(lats.length<3)return null;
+    const avg=lats.reduce((a,b)=>a+b,0)/lats.length;
+    const variance=lats.reduce((a,b)=>a+(b-avg)**2,0)/lats.length;
+    const cv=Math.sqrt(variance)/Math.max(1,avg);
+    return Math.max(0,Math.min(100,Math.round(100-cv*22)));
+  }
+  return{A:stab(P[A]),B:stab(P[B])};
+}
+
+/* ── 처방전 Keep/Watch/Try ── */
+function prescription(R,purpose){
+  const {P,A,B,temp}=R;
+  const balance=Math.min(P[A].msgs,P[B].msgs)/Math.max(P[A].msgs,P[B].msgs);
+  const maps={
+    interest:{keep:`${trim(B)}의 이야기에 성실히 반응하기`,watch:`일방적인 화제 전환이 반복되진 않는지`,tryit:`가벼운 만남 제안으로 관심 온도 직접 확인하기`},
+    cooling:{keep:temp>=60?`지금의 따뜻한 대화 흐름`:`대화가 끊기지 않도록 꾸준히 안부 건네기`,watch:`대화가 점점 짧아지거나 형식적이 되진 않는지`,tryit:`작은 일상 공유로 온도를 서서히 올리기`},
+    effort:{keep:balance>0.65?`지금의 균형 잡힌 대화 리듬`:`현재의 성실한 노력 자체`,watch:balance<0.5?`내가 혼자 너무 많이 이끌고 있지 않은지`:`상대가 먼저 연락할 여백 주기`,tryit:`질문 대신 내 일상을 먼저 공유해보기`},
+    conflict:{keep:`갈등을 피하지 않고 대화로 풀려는 태도`,watch:`부정적 표현이 자주 반복되는 주제`,tryit:`싸운 직후 짧은 화해 문자 한 줄 보내기`},
+    style:{keep:`나만의 고유한 말투와 표현 방식`,watch:`과도한 쿠션어가 불필요한 거리를 만들지 않는지`,tryit:`조금 더 직접적인 감정 표현 한 번 써보기`}
+  };
+  return maps[purpose]||maps.interest;
+}
+
+/* ── 다음 답장 추천 ── */
+function nextReplyRecs(R,purpose){
+  const {temp}=R;
+  const isWarm=temp>=65;
+  const recs={
+    interest:[
+      {mode:"관심 표현",text:"오늘 있었던 일 생각하다가 연락했어 ㅎ"},
+      {mode:"대화 확장",text:"그거 더 얘기해줘, 어떻게 됐어?"},
+      {mode:"만남 제안",text:"근처 새 카페 생겼는데 같이 가볼래?"}
+    ],
+    cooling:[
+      {mode:"자연스러운 안부",text:"요즘 어떻게 지내? 한동안 바빴지?"},
+      {mode:"추억 소환",text:"갑자기 그때 우리 같이 갔던 거 생각나더라"},
+      {mode:"가벼운 약속",text:"곧 시간 되면 얼굴 한번 보자 🙂"}
+    ],
+    effort:[
+      {mode:"여백 주기",text:"(한 박자 쉬고 상대가 먼저 연락할 공간 만들기)"},
+      {mode:"짧게 나누기",text:"나중에 얘기해줄게 — 나도 비슷한 일 있었어"},
+      {mode:"질문 줄이기",text:"그렇구나. 나는 오늘 ○○ 했어 😊"}
+    ],
+    conflict:[
+      {mode:"화해 시도",text:"아까 내가 좀 예민했나봐, 미안해"},
+      {mode:"공감 먼저",text:"힘들었겠다, 내가 잘 몰랐어"},
+      {mode:"화제 전환",text:"우리 그 얘기 잠깐 내려놓고 — 오늘 뭐 먹었어?"}
+    ],
+    style:[
+      {mode:"직접 표현",text:isWarm?"나 사실 많이 기대하고 있어":"솔직히 요즘 좀 보고 싶었어"},
+      {mode:"유머 추가",text:"이 사람이 또 나를 웃게 만드네요 ㅋㅋ"},
+      {mode:"공감 강화",text:"진짜? 나도 그런 적 있어, 얼마나 힘들었어"}
+    ]
+  };
+  return recs[purpose]||recs.interest;
+}
+
+/* ── 대화 장르 ── */
+function conversationGenre(R){
+  const {temp,relRomantic,P,A,B,totalMsg,formalHard,posPct}=R;
+  const laughter=(P[A].laugh+P[B].laugh)/Math.max(1,totalMsg);
+  const balance=Math.min(P[A].msgs,P[B].msgs)/Math.max(P[A].msgs,P[B].msgs);
+  const negR=(100-posPct)/100;
+  const avgLen=(P[A].avgLen+P[B].avgLen)/2;
+  const scores={
+    "🌸 로맨틱 코미디":Math.round(relRomantic*350+laughter*180+temp*0.6),
+    "🕵️ 심리 스릴러":Math.round(negR*200+(1-balance)*140),
+    "☕ 잔잔한 일상 드라마":Math.round(balance*120+(1-negR)*100+(temp>=52&&temp<68?30:0)),
+    "😂 시트콤":Math.round(laughter*420+balance*80),
+    "📜 진지한 다큐":Math.round(avgLen*1.5+formalHard*180)
+  };
+  const total=Math.max(1,Object.values(scores).reduce((a,b)=>a+b,0));
+  const entries=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  const pct=entries.map(([k,v])=>[k,Math.round(v/total*100)]);
+  const diff=100-pct.reduce((a,b)=>a+b[1],0);
+  if(pct.length)pct[0][1]+=diff;
+  return pct;
+}
+
+/* ── 트렌드 ── */
+function buildTrend(R){
+  const {conv,hasDate}=R;
+  const N=Math.min(8,Math.max(4,Math.floor(conv.length/6)));
+  const buckets=Array.from({length:N},()=>({pos:0,neg:0,count:0,label:""}));
+  if(hasDate){
+    const t0=conv[0].t.getTime(),t1=conv[conv.length-1].t.getTime();
+    const span=Math.max(1,t1-t0);
+    conv.forEach(m=>{const bi=Math.min(N-1,Math.floor((m.t.getTime()-t0)/span*N)); fill(buckets[bi],m);});
+    buckets.forEach((b,i)=>{const tt=new Date(t0+span*(i+0.5)/N);b.label=`${tt.getMonth()+1}/${tt.getDate()}`;});
+  } else {
+    const per=Math.ceil(conv.length/N);
+    conv.forEach((m,i)=>{fill(buckets[Math.min(N-1,Math.floor(i/per))],m);});
+    buckets.forEach((b,i)=>b.label=`구간 ${i+1}`);
+  }
+  buckets.forEach(b=>{const tot=b.pos+b.neg;b.temp=tot?Math.round(42+(b.pos/tot)*48):60;});
+  return buckets;
+  function fill(b,m){b.count++;const s=sentimentOf(m.text);b.pos+=s.pos;b.neg+=s.neg;}
+}
+function trendInsight(R,buckets){
+  const half=buckets.length>>1;
+  const avg=arr=>arr.reduce((a,b)=>a+b.temp,0)/Math.max(1,arr.length);
+  const dt=Math.round(avg(buckets.slice(half))-avg(buckets.slice(0,half)));
+  const lvl=R.temp>=72?"hot":R.temp>=58?"warm":"cool";
+  const trend=dt>=6?"up":dt<=-6?"down":"flat";
+  const M={
+    "hot|flat":"뜨거운 온도가 <b>안정적으로 유지</b>되고 있어요. 🔥",
+    "hot|up":`가뜩이나 뜨거운데 최근 <b>약 ${dt}° 더 달아올랐어요</b>. 🔥📈`,
+    "hot|down":`뜨겁던 흐름이 최근 <b>약 ${Math.abs(dt)}° 살짝 식는 기미</b>가 보여요. 🌡️`,
+    "warm|flat":"따뜻한 온도가 <b>잔잔하게 유지</b>되고 있어요. 🌤️",
+    "warm|up":`최근으로 올수록 <b>약 ${dt}° 따뜻해지는 흐름</b>이에요. 🌈`,
+    "warm|down":`최근 <b>약 ${Math.abs(dt)}° 가라앉는 중</b>이에요. 가벼운 안부 한 마디 어때요? 🫶`,
+    "cool|flat":"<b>차분하게 가라앉은 상태</b>가 이어지고 있어요. 🌊",
+    "cool|up":`식었던 온도가 최근 <b>약 ${dt}° 다시 오르는 중</b>이에요. 🌱`,
+    "cool|down":`온도가 최근 <b>약 ${Math.abs(dt)}° 더 내려갔어요</b>. 🫶`
+  };
+  return M[lvl+"|"+trend];
+}
+
+/* ── 키워드 ── */
+const DOMAIN_KO={
+  "youtube":"유튜브","youtu":"유튜브","naver":"네이버","kakao":"카카오",
+  "instagram":"인스타","tiktok":"틱톡","twitter":"트위터","x.com":"트위터",
+  "coupang":"쿠팡","baemin":"배민","배달의민족":"배민","melon":"멜론",
+  "netflix":"넷플","spotify":"스포티파이","apple":"애플"
+};
+function topWords(conv){
+  const cnt={};
+  conv.forEach(m=>{
+    let txt=m.text;
+    // URL에서 도메인 한국어로 치환
+    txt=txt.replace(/https?:\/\/([^/\s]+)[^\s]*/gi,(_,domain)=>{
+      const d=domain.toLowerCase();
+      for(const [k,v] of Object.entries(DOMAIN_KO)) if(d.includes(k)) return " "+v+" ";
+      return " ";
+    });
+    txt=txt.replace(/www\.\S+/gi," ");
+    txt.replace(reEmojiG,"").split(/[\s,.!?~"''""()\[\]{}<>/\\:;|=+\-_*#@\n。·\d]+/).forEach(tok=>{
+      let w=tok.trim().replace(/[ㅋㅎㅠㅜ!?.,~]+$/,"").replace(/^[ㅋㅎㅠㅜ!?.,~]+/,"");
+      if(!w||w.length<2) return;
+      if(STOP.has(w)||URLISH.test(w)) return;
+      if(/[a-zA-Z]/.test(w)) return;
+      if(/^[ㄱ-ㅎㅏ-ㅣ]+$/.test(w)) return;
+      w=stem(w);
+      if(w.length<2||w.length>10) return;
+      if(STOP.has(w)||/^\d+$/.test(w)||/^[ㄱ-ㅎㅏ-ㅣ]+$/.test(w)) return;
+      cnt[w]=(cnt[w]||0)+1;
+    });
+  });
+  return Object.entries(cnt).filter(e=>e[1]>=2).sort((a,b)=>b[1]-a[1]).slice(0,12);
+}
+
+/* ── SVG 차트 ── */
+function trendSVG(b){
+  const W=320,H=160,padL=10,padR=10,padT=14,padB=28;
+  const n=b.length,iw=W-padL-padR,ih=H-padT-padB;
+  const maxC=Math.max(1,...b.map(x=>x.count));
+  const x=i=>padL+(n>1?i/(n-1)*iw:iw/2);
+  const yT=v=>padT+ih-(v-30)/67*ih;
+  const bw=Math.max(8,iw/n*0.44);
+  let bars="";
+  b.forEach((d,i)=>{const h=d.count/maxC*ih;const tot=d.pos+d.neg;
+    const col=tot===0?"#4B5563":(d.pos>=d.neg?"#34D399":"#F87171");
+    bars+=`<rect x="${(x(i)-bw/2).toFixed(1)}" y="${(padT+ih-h).toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1,h).toFixed(1)}" rx="3" fill="${col}" opacity=".38"/>`;});
+  const pts=b.map((d,i)=>`${x(i).toFixed(1)},${yT(d.temp).toFixed(1)}`).join(" ");
+  const dots=b.map((d,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${yT(d.temp).toFixed(1)}" r="3.5" fill="#FBBF24" stroke="#111827" stroke-width="1.2"/>`).join("");
+  const labels=b.map((d,i)=>`<text x="${x(i).toFixed(1)}" y="${H-9}" font-size="11" fill="#6B7280" text-anchor="middle">${esc(d.label)}</text>`).join("");
+  return `<svg class="trend" viewBox="0 0 ${W} ${H}" role="img" aria-label="감정 흐름 그래프">
+    ${bars}<polyline points="${pts}" fill="none" stroke="#FBBF24" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    ${dots}${labels}</svg>`;
+}
+
+/* ── 공유 카드 ── */
+function drawShareCard(){
+  if(!LAST)return;
+  const {R,rel,pa,pb}=LAST;
+  const c=document.querySelector("#shareCanvas"),g=c.getContext("2d");
+  const W=c.width,H=c.height;
+  const bg=g.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,"#111827"); bg.addColorStop(.5,"#1a1f35"); bg.addColorStop(1,"#1f1435");
+  g.fillStyle=bg; g.fillRect(0,0,W,H);
+  radial(g,W*0.2,H*0.15,280,"rgba(108,140,255,.40)");
+  radial(g,W*0.85,H*0.9,320,"rgba(167,139,250,.28)");
+  radial(g,W*0.5,H*0.5,200,"rgba(255,122,144,.10)");
+  g.textAlign="center";
+  g.fillStyle="rgba(249,250,251,.8)"; g.font="700 26px Pretendard, sans-serif";
+  g.fillText("톡미러 · TalkMirror", W/2, 68);
+  g.fillStyle="#9CA3AF"; g.font="500 18px Pretendard, sans-serif";
+  g.fillText("우리 대화가 비추는 관계는…", W/2, 148);
+  g.font="800 32px Pretendard, sans-serif";
+  wrapText(g,rel.badge,W/2,210,W-80,42,"#ffffff");
+  drawTempRing(g,W/2,470,120);
+  g.fillStyle="#fff"; g.font="800 74px Pretendard, sans-serif"; g.textAlign="center";
+  g.fillText(R.temp+"°",W/2,490);
+  g.fillStyle="#9CA3AF"; g.font="600 17px Pretendard, sans-serif";
+  g.fillText("감정 온도",W/2,528);
+  const A=R.A,B=R.B,la=R.P[A].medLat,lb=R.P[B].medLat;
+  g.fillStyle="rgba(255,255,255,.06)"; roundRect(g,40,638,W-80,148,24); g.fill();
+  g.fillStyle="#6C8CFF"; g.font="700 17px Pretendard, sans-serif"; g.textAlign="left";
+  g.fillText(MODE==="warm"?"답장 리듬 🎵":"답장 속도 대결 ⚔️",70,680);
+  g.fillStyle="#F9FAFB"; g.font="600 20px Pretendard, sans-serif";
+  g.fillText(`${cut(A,7)}  ${la!=null?speedLabel(la,MODE):"—"}`,70,718);
+  g.fillText(`${cut(B,7)}  ${lb!=null?speedLabel(lb,MODE):"—"}`,70,756);
+  g.textAlign="center"; g.fillStyle="#D4CCFF"; g.font="600 16px Pretendard, sans-serif";
+  wrapText(g,`${cut(A,6)}: ${pa.title}  ·  ${cut(B,6)}: ${pb.title}`,W/2,830,W-70,26,"#D4CCFF");
+  g.fillStyle="rgba(0,0,0,.32)"; roundRect(g,70,886,W-140,46,23); g.fill();
+  g.fillStyle="#fff"; g.font="700 16px Pretendard, sans-serif"; g.textAlign="center";
+  g.fillText("🔍 톡미러에서 우리 관계 분석해보기",W/2,914);
+}
+function cut(s,n){return s.length>n?s.slice(0,n)+"…":s;}
+function radial(g,x,y,r,col){const rg=g.createRadialGradient(x,y,0,x,y,r);rg.addColorStop(0,col);rg.addColorStop(1,"rgba(0,0,0,0)");g.fillStyle=rg;g.beginPath();g.arc(x,y,r,0,7);g.fill();}
+function roundRect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
+function drawTempRing(g,cx,cy,r){const cols=["#6C8CFF","#A78BFA","#FF7A90","#FF8A5B"];for(let i=0;i<240;i++){const a=-Math.PI/2+i/240*Math.PI*2;const t=i/240;const ci=Math.min(3,Math.floor(t*4));g.strokeStyle=cols[ci];g.lineWidth=13;g.beginPath();g.arc(cx,cy,r,a,a+0.03);g.stroke();}}
+function wrapText(g,text,x,y,maxW,lh,color){g.fillStyle=color;const words=text.split(" ");let line="",yy=y;for(const w of words){const test=line?line+" "+w:w;if(g.measureText(test).width>maxW&&line){g.fillText(line,x,yy);line=w;yy+=lh;}else line=test;}g.fillText(line,x,yy);}
+
+/* ── 렌더 ── */
+const $=s=>document.querySelector(s);
+function fmtMin(m){if(m==null)return "데이터 부족";if(m<1)return "1분 이내";if(m<60)return Math.round(m)+"분";const h=Math.floor(m/60);const mm=Math.round(m%60);return mm?h+"시간 "+mm+"분":h+"시간";}
+function esc(s){return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));}
+
+let LAST=null, MODE="fun", REL_HINT="auto", PURPOSE="interest";
+
+function render(R){
+  const rel=relationshipType(R);
+  const buckets=buildTrend(R);
+  const insight=trendInsight(R,buckets);
+  const pa=personalityOf(R.P[R.A]),pb=personalityOf(R.P[R.B]);
+  const eggs=easterEggs(R);
+  const outsider=outsiderView(R);
+  const pwIns=purposeInsight(R,PURPOSE);
+  const pc=periodComparison(R);
+  const fd=flirtingDensity(R);
+  const ss=stabilityScore(R);
+  const genre=conversationGenre(R);
+  const rx=prescription(R,PURPOSE);
+  const recs=nextReplyRecs(R,PURPOSE);
+  LAST={R,rel,buckets,pa,pb,insight};
+
+  $("#relBadge").textContent=rel.badge;
+  $("#relNote").textContent=rel.note;
+  $("#subnames").innerHTML=`<b>${esc(R.A)}</b> ✕ <b>${esc(R.B)}</b>`+(R.isGroup?` <span style="color:var(--text-faint)">· 발화량 상위 2명 기준</span>`:"");
+
+  const purposeNames={interest:"💘 관심 신호",cooling:"🌡️ 온도 변화",effort:"⚖️ 노력 균형",conflict:"🌀 갈등 패턴",style:"🪞 말투 분석"};
+  $("#purposeTag").innerHTML=`<div class="purpose-tag">${purposeNames[PURPOSE]||""} 기준으로 분석했어요</div>`;
+
+  const tempDesc=R.temp>=80?"뜨겁게 끓는 중":R.temp>=65?"따뜻하게 데워진 사이":R.temp>=52?"미지근한 온기":"차분히 가라앉은 상태";
+  const P=R.P,A=R.A,B=R.B;
+  const initApct=Math.round(P[A].initiations/R.totalInit*100);
+  const msgApct=Math.round(P[A].msgs/R.totalMsg*100);
+  const la=P[A].medLat,lb=P[B].medLat;
+  const latWin=(la!=null&&lb!=null)?(la<lb?"winA":"winB"):"";
+  const words=topWords(R.conv);
+  const maxF=words.length?words[0][1]:1;
+  const cloud=words.map(([w,f])=>{
+    const sz=(15+(f/maxF)*18).toFixed(1);
+    const op=(0.55+(f/maxF)*0.45).toFixed(2);
+    const hot=f/maxF>0.66;
+    return `<span class="cw" style="font-size:${sz}px;opacity:${op};${hot?`color:var(--blue);font-weight:800`:""}">${esc(w)}</span>`;
+  }).join("");
+  const posEx=R.posSignals.length?R.posSignals.join(' · '):'뚜렷한 긍정어 적음';
+  const negEx=R.negSignals.length?R.negSignals.join(' · '):'뚜렷한 부정어 적음';
+
+  // 목적별 인사이트 카드
+  const pwCard=pwIns.text?`<div class="pw-insight"><div class="pw-label">${esc(pwIns.label)}</div>${pwIns.text}</div>`:"";
+
+  // 이스터에그
+  const eggHtml=eggs.length?`<div class="egg-strip">${eggs.map(e=>`<div class="egg"><b>관찰됨</b> ${esc(e)}</div>`).join("")}</div>`:"";
+
+  // 남들이 보면
+  const outsiderHtml=`<div class="outsider">
+    <div class="title">남들이 보면 무슨 사이 같을까? <span style="color:var(--text-faint);font-weight:400">(재미로만 봐요)</span></div>
+    <div class="out-bars">${outsider.map(([label,pct])=>`
+      <div class="out-row">
+        <span class="out-label">${esc(label)}</span>
+        <div class="out-bar"><div class="out-fill" style="width:${pct}%"></div></div>
+        <span class="out-pct">${pct}%</span>
+      </div>`).join("")}</div></div>`;
+
+  const cards=[
+    // 1. 온도 + 목적 인사이트
+    `<div class="glass card"><h3><span class="dot"></span>감정 온도계</h3>
+      <div class="temp-wrap">
+        <div class="gauge-ring"><div class="gauge"></div><div class="gauge-inner"></div><div class="val"><b>${R.temp}°</b><small>C</small></div></div>
+        <div class="temp-desc"><div class="big">${tempDesc}</div><p>대화 속 긍정·부정 신호를 종합한 온도예요.</p></div>
+      </div>
+      <div class="signals">
+        <div class="sigbar"><span class="sp" style="width:${R.posPct}%"></span><span class="sn" style="width:${100-R.posPct}%"></span></div>
+        <div class="sigrow"><span class="pos">긍정 ${R.posPct}%</span><span class="neg">부정 ${100-R.posPct}%</span></div>
+        <div class="sigex"><b>긍정 신호</b> ${esc(posEx)}<br><b>부정 신호</b> ${esc(negEx)}</div>
+      </div>
+      ${pwCard}</div>`,
+
+    // 2. 소통 성향
+    `<div class="glass card"><h3><span class="dot"></span>소통 성향</h3>
+      <div class="ptype">
+        <div class="pcard a"><div class="picon">${pa.icon}</div><div class="who">${esc(trim(A))}</div><div class="ptitle">${pa.title}</div><div class="pdesc">${pa.desc}</div></div>
+        <div class="pcard b"><div class="picon">${pb.icon}</div><div class="who">${esc(trim(B))}</div><div class="ptitle">${pb.title}</div><div class="pdesc">${pb.desc}</div></div>
+      </div></div>`,
+
+    // 3. 핑퐁
+    `<div class="glass card"><h3><span class="dot"></span>대화의 핑퐁</h3>
+      <div class="metric"><div class="mlabel"><span>평균 답장 속도 <small style="color:var(--text-faint)">(중앙값)</small></span></div>
+        <div class="vs ${latWin}">
+          <div class="left"><div class="who">${esc(trim(A))}</div><div class="num">${fmtMin(la)}</div><div class="speed">${la!=null?speedLabel(la,MODE):"표본 부족"}</div></div>
+          <div class="mid">vs</div>
+          <div class="right"><div class="who">${esc(trim(B))}</div><div class="num">${fmtMin(lb)}</div><div class="speed">${lb!=null?speedLabel(lb,MODE):"표본 부족"}</div></div>
+        </div></div>
+      <div class="metric"><div class="mlabel"><span>대화량 비율</span><span class="mpct">${msgApct} : ${100-msgApct}</span></div>
+        <div class="ratio"><div class="a" style="width:${msgApct}%"></div><div class="b" style="width:${100-msgApct}%"></div></div></div>
+      <div class="metric"><div class="mlabel"><span>선톡(먼저 연락) 비율</span><span class="mpct">${initApct} : ${100-initApct}</span></div>
+        <div class="ratio"><div class="a" style="width:${initApct}%"></div><div class="b" style="width:${100-initApct}%"></div></div></div>
+    </div>`,
+
+    // 4. 키워드
+    words.length>=3?`<div class="glass card"><h3><span class="dot"></span>많이 쓴 단어</h3><div class="cloud">${cloud}</div>
+      ${outsiderHtml}</div>`:"",
+
+    // 5. 트렌드
+    `<div class="glass card"><h3><span class="dot"></span>시간에 따른 감정 흐름</h3>
+      <div class="chartbox">${trendSVG(buckets)}</div>
+      <div class="legend"><span><i style="background:#34D399"></i>긍정 우세</span><span><i style="background:#F87171"></i>부정 우세</span><span><i style="background:#FBBF24;height:8px;width:8px;border-radius:50%"></i>감정 온도</span></div>
+      <div class="insight">${insight}</div></div>`,
+
+    // 6. 이스터에그
+    eggHtml?`<div class="glass card"><h3><span class="dot"></span>대화에서 포착된 것들</h3>${eggHtml}</div>`:"",
+
+    // 7. 기간 비교 + 설렘 밀도
+    (()=>{
+      const tcls=t=>t>=68?"ph-hot":t>=52?"ph-warm":"ph-cool";
+      const dcls=pc.delta>=5?"d-up":pc.delta<=-5?"d-down":"d-flat";
+      const dtxt=pc.delta>=5?`▲ ${pc.delta}° 따뜻해졌어요`:pc.delta<=-5?`▼ ${Math.abs(pc.delta)}° 식었어요`:"→ 큰 변화 없어요";
+      return `<div class="glass card"><h3><span class="dot"></span>초반 vs 최근 온도 변화</h3>
+        <div class="period-cmp">
+          <div class="period-half"><div class="ph-label">초반</div><div class="ph-temp ${tcls(pc.t1)}">${pc.t1}°</div></div>
+          <div class="period-mid">→</div>
+          <div class="period-half"><div class="ph-label">최근</div><div class="ph-temp ${tcls(pc.t2)}">${pc.t2}°</div></div>
+        </div>
+        <div style="text-align:center;margin-top:12px"><span class="delta-pill ${dcls}">${dtxt}</span></div>
+        <h3 style="margin-top:18px"><span class="dot" style="background:var(--coral);box-shadow:0 0 8px var(--coral)"></span>설렘 밀도</h3>
+        <div class="flirt-row"><span class="fl-name">${esc(trim(A))}</span><div class="flirt-bar"><div class="flirt-fill" style="width:${fd.A}%"></div></div><span class="fl-pct">${fd.A}</span></div>
+        <div class="flirt-row"><span class="fl-name">${esc(trim(B))}</span><div class="flirt-bar"><div class="flirt-fill" style="width:${fd.B}%"></div></div><span class="fl-pct">${fd.B}</span></div>
+        <p style="margin-top:8px;font-size:11.5px;color:var(--text-faint)">설렘 표현·이모티콘·질문·웃음을 종합한 지수예요.</p>
+      </div>`;
+    })(),
+
+    // 8. 안정감 지수
+    (()=>{
+      const cls=v=>v===null?"sc-na":v>=70?"sc-h":v>=40?"sc-m":"sc-l";
+      const lbl=v=>v===null?"데이터 부족":v>=70?"안정적 💚":v>=40?"보통 💛":"불규칙 🔴";
+      return `<div class="glass card"><h3><span class="dot"></span>답장 안정감 지수</h3>
+        <div class="score-grid">
+          <div class="sc-item"><div class="sc-who">${esc(trim(A))}</div><div class="sc-val ${cls(ss.A)}">${ss.A!==null?ss.A:"—"}</div><div class="sc-sub">${lbl(ss.A)}</div></div>
+          <div class="sc-item"><div class="sc-who">${esc(trim(B))}</div><div class="sc-val ${cls(ss.B)}">${ss.B!==null?ss.B:"—"}</div><div class="sc-sub">${lbl(ss.B)}</div></div>
+        </div>
+        <p style="margin-top:12px;font-size:12px;color:var(--text-faint);line-height:1.6">답장 텀이 일정할수록 점수가 높아요. 100에 가까울수록 예측 가능한 리듬이에요.</p>
+      </div>`;
+    })(),
+
+    // 9. 대화 장르
+    (()=>{
+      const genreColors=["#FF7A90","#A78BFA","#6C8CFF","#FBBF24","#34D399"];
+      return `<div class="glass card"><h3><span class="dot"></span>이 대화의 장르는?</h3>
+        <div class="genre-list">${genre.map(([name,pct],i)=>`
+          <div class="genre-row">
+            <span class="ge-label">${esc(name)}</span>
+            <div class="ge-bar"><div class="ge-fill" style="width:${pct}%;background:${genreColors[i%genreColors.length]}"></div></div>
+            <span class="ge-pct">${pct}%</span>
+          </div>`).join("")}
+        </div>
+        ${genre[0]?`<div class="insight" style="margin-top:12px">이 대화는 <b>${esc(genre[0][0])}</b> 장르가 ${genre[0][1]}%로 가장 강해요.</div>`:""}
+      </div>`;
+    })(),
+
+    // 10. 처방전
+    `<div class="glass card"><h3><span class="dot"></span>관계 처방전 💊</h3>
+      <div class="rx-list">
+        <div class="rx-item rx-keep"><div class="rx-icon">✅</div><div><div class="rx-tag">Keep — 이건 계속</div><div class="rx-text">${esc(rx.keep)}</div></div></div>
+        <div class="rx-item rx-watch"><div class="rx-icon">👀</div><div><div class="rx-tag">Watch — 주의</div><div class="rx-text">${esc(rx.watch)}</div></div></div>
+        <div class="rx-item rx-try"><div class="rx-icon">💡</div><div><div class="rx-tag">Try — 시도해보기</div><div class="rx-text">${esc(rx.tryit)}</div></div></div>
+      </div>
+    </div>`,
+
+    // 11. 다음 답장 추천
+    `<div class="glass card"><h3><span class="dot"></span>다음 답장 추천</h3>
+      <div class="reply-list">${recs.map(r=>`
+        <div class="reply-item"><div class="ri-mode">${esc(r.mode)}</div><div class="ri-text">"${esc(r.text)}"</div></div>`).join("")}
+      </div>
+      <p style="margin-top:12px;font-size:11.5px;color:var(--text-faint);line-height:1.6">참고용 아이디어예요. 내 상황에 맞게 자유롭게 바꿔 써보세요 :)</p>
+    </div>`
+  ].join("");
+
+  $("#cards").innerHTML=cards;
+}
+
+/* ── 플로우 ── */
+const STEPS=[
+  "대화창의 먼지를 털고 있어요",
+  "웃음과 한숨을 분리하는 중이에요",
+  "답장 텀의 미스터리를 추적 중이에요",
+  "말투 사이의 온도를 재고 있어요",
+  "관계 거울을 닦는 중이에요"
+];
+
+function runAnalysis(raw){
+  let parsed,R;
+  try{parsed=parseChat(raw);R=analyze(parsed);}
+  catch(e){return showErr(e.message);}
+  show("loading");
+  let i=0;
+  const fill=$("#barfill"),step=$("#loadstep");
+  fill.style.width="6%";
+  const iv=setInterval(()=>{
+    i++;step.textContent=STEPS[Math.min(i,STEPS.length-1)];
+    fill.style.width=Math.min(95,6+i*18)+"%";
+    if(i>=STEPS.length){clearInterval(iv);fill.style.width="100%";
+      setTimeout(()=>{render(R);show("report");window.scrollTo(0,0);},400);}
+  },560);
+}
+
+function showErr(code){
+  const el=$("#err");
+  const map={
+    few:"대화가 너무 짧아요. 메시지가 더 많은 대화를 붙여넣어 주세요.",
+    one:"두 사람 이상의 대화가 필요해요. 발화자가 둘 이상인지 확인해 주세요.",
+    parse:"형식을 알아보지 못했어요. 카톡에서 그대로 복사한 텍스트인지 확인해 주세요."
+  };
+  el.textContent=map[code]||map.parse; el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"),5000);
+}
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  $("#loading").classList.remove("active");
+  const t=id==="loading"?$("#loading"):$("#"+id);
+  t.classList.add("active");
+}
+
+/* ── 파일 인코딩 자동 감지 ── */
+function readFileAuto(file,cb){
+  // 1) ArrayBuffer로 읽어서 UTF-8 BOM / EUC-KR 감지
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const buf=e.target.result;
+    const bytes=new Uint8Array(buf);
+    // UTF-8 BOM (EF BB BF)
+    const hasBOM=bytes[0]===0xEF&&bytes[1]===0xBB&&bytes[2]===0xBF;
+    // UTF-8 decode 시도
+    try{
+      const decoded=new TextDecoder("utf-8",{fatal:true}).decode(buf);
+      const text=hasBOM?decoded.slice(1):decoded;
+      cb(text);
+    } catch(_){
+      // EUC-KR fallback
+      try{
+        const decoded=new TextDecoder("euc-kr").decode(buf);
+        cb(decoded);
+      } catch(e2){
+        // 최후 fallback: 강제 UTF-8
+        cb(new TextDecoder("utf-8",{fatal:false}).decode(buf));
+      }
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* ── 와이어링 ── */
+const panel=$("#panel"),ta=$("#ta"),go=$("#go"),fileInput=$("#file"),drop=$("#drop");
+let inputMode="paste", fileText="";
+
+function refreshGo(){go.disabled=inputMode==="paste"?ta.value.trim().length<10:!fileText;}
+
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+  inputMode=t.dataset.mode; panel.dataset.mode=inputMode;
+  document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected",x===t));
+  $("#pasteArea").hidden=inputMode!=="paste";
+  $("#fileArea").hidden=inputMode!=="file";
+  refreshGo();
+}));
+ta.addEventListener("input",refreshGo);
+
+drop.addEventListener("click",()=>fileInput.click());
+drop.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();fileInput.click();}});
+["dragover","dragenter"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over");}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over");}));
+drop.addEventListener("drop",e=>{const f=e.dataTransfer.files[0];if(f)loadFile(f);});
+fileInput.addEventListener("change",e=>{const f=e.target.files[0];if(f)loadFile(f);});
+function loadFile(f){
+  readFileAuto(f,text=>{
+    fileText=text;
+    const fname=$("#fname"); fname.textContent="✓ "+f.name; fname.classList.add("show");
+    refreshGo();
+  });
+}
+
+// landing → purpose
+go.addEventListener("click",()=>show("purpose-screen"));
+$("#demo").addEventListener("click",()=>{PURPOSE="interest";runAnalysis(DEMO);});
+$("#backToLanding").addEventListener("click",()=>show("landing"));
+
+// purpose 선택
+document.querySelectorAll(".pc").forEach(btn=>btn.addEventListener("click",()=>{
+  document.querySelectorAll(".pc").forEach(x=>x.setAttribute("aria-selected","false"));
+  btn.setAttribute("aria-selected","true");
+  PURPOSE=btn.dataset.purpose;
+  $("#startAnalysis").disabled=false;
+}));
+$("#startAnalysis").addEventListener("click",()=>{
+  const raw=inputMode==="paste"?ta.value:fileText;
+  runAnalysis(raw);
+});
+
+$("#restart").addEventListener("click",()=>{show("landing");window.scrollTo(0,0);});
+
+// 장난/다정 모드
+document.querySelectorAll(".mode").forEach(btn=>btn.addEventListener("click",()=>{
+  MODE=btn.dataset.mode;
+  document.querySelectorAll(".mode").forEach(x=>x.setAttribute("aria-selected",x===btn));
+  if(LAST)render(LAST.R);
+}));
+
+// 카카오 공유 카드 (1:1 정사각형, 800×800)
+function drawKakaoCard(){
+  if(!LAST)return;
+  const {R,rel,pa,pb}=LAST;
+  const c=document.querySelector("#shareCanvasKakao"),g=c.getContext("2d");
+  const W=c.width,H=c.height;
+  // 배경
+  const bg=g.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,"#111827"); bg.addColorStop(1,"#1a1435");
+  g.fillStyle=bg; g.fillRect(0,0,W,H);
+  radial(g,W*0.15,H*0.15,300,"rgba(108,140,255,.45)");
+  radial(g,W*0.85,H*0.85,280,"rgba(167,139,250,.32)");
+  radial(g,W*0.5,H*0.5,220,"rgba(255,122,144,.10)");
+  g.textAlign="center";
+  // 브랜드
+  g.fillStyle="rgba(249,250,251,.75)"; g.font="600 22px Pretendard, sans-serif";
+  g.fillText("🪞 톡미러 TalkMirror", W/2, 60);
+  // 관계 뱃지
+  g.font="800 36px Pretendard, sans-serif";
+  wrapText(g,rel.badge,W/2,150,W-80,46,"#ffffff");
+  // 구분선
+  g.strokeStyle="rgba(255,255,255,.12)"; g.lineWidth=1;
+  g.beginPath(); g.moveTo(80,210); g.lineTo(W-80,210); g.stroke();
+  // 온도 링
+  drawTempRing(g,W/2,360,110);
+  g.fillStyle="#fff"; g.font="800 68px Pretendard, sans-serif";
+  g.fillText(R.temp+"°",W/2,376);
+  g.fillStyle="#9CA3AF"; g.font="600 17px Pretendard, sans-serif";
+  g.fillText("감정 온도",W/2,412);
+  // 지표 두 줄
+  const A=R.A,B=R.B;
+  const msgApct=Math.round(R.P[A].msgs/R.totalMsg*100);
+  const initApct=Math.round(R.P[A].initiations/R.totalInit*100);
+  g.fillStyle="rgba(255,255,255,.06)"; roundRect(g,50,510,W-100,210,20); g.fill();
+  // 페르소나
+  g.fillStyle="#6C8CFF"; g.font="700 16px Pretendard, sans-serif"; g.textAlign="left";
+  g.fillText("소통 성향",70,548);
+  g.fillStyle="#F9FAFB"; g.font="600 18px Pretendard, sans-serif";
+  g.fillText(`${cut(A,6)}  ${pa.title}`,70,580);
+  g.fillText(`${cut(B,6)}  ${pb.title}`,70,610);
+  g.strokeStyle="rgba(255,255,255,.10)"; g.lineWidth=1;
+  g.beginPath(); g.moveTo(70,628); g.lineTo(W-70,628); g.stroke();
+  // 발화량
+  g.fillStyle="#A78BFA"; g.font="700 15px Pretendard, sans-serif";
+  g.fillText("대화량",70,656);
+  g.fillStyle="#9CA3AF"; g.font="600 15px Pretendard, sans-serif";
+  g.fillText(`${cut(A,5)} ${msgApct}%  :  ${cut(B,5)} ${100-msgApct}%`,70,680);
+  // 선톡
+  g.fillStyle="#A78BFA"; g.font="700 15px Pretendard, sans-serif";
+  g.fillText("선톡",70,704);
+  g.fillStyle="#9CA3AF"; g.font="600 15px Pretendard, sans-serif";
+  g.fillText(`${cut(A,5)} ${initApct}%  :  ${cut(B,5)} ${100-initApct}%`,70,728);
+  // CTA 배너
+  g.fillStyle="rgba(108,140,255,.20)"; roundRect(g,50,750,W-100,38,19); g.fill();
+  g.strokeStyle="rgba(108,140,255,.40)"; g.lineWidth=1.2; g.stroke();
+  g.fillStyle="#fff"; g.font="700 15px Pretendard, sans-serif"; g.textAlign="center";
+  g.fillText("🔍 톡미러에서 우리 대화 분석해보기",W/2,774);
+}
+
+let shareMode="insta";
+// 공유 탭 전환
+document.querySelectorAll(".share-tab").forEach(btn=>btn.addEventListener("click",()=>{
+  shareMode=btn.dataset.share;
+  document.querySelectorAll(".share-tab").forEach(x=>x.setAttribute("aria-selected",x===btn));
+  const instaCanvas=document.querySelector("#shareCanvas");
+  const kakaoCanvas=document.querySelector("#shareCanvasKakao");
+  const note=document.querySelector("#shareNote");
+  if(shareMode==="kakao"){
+    instaCanvas.style.display="none"; kakaoCanvas.style.display="block";
+    note.textContent="카카오톡 공유에 최적화된 정사각형 이미지예요";
+    drawKakaoCard();
+  } else {
+    kakaoCanvas.style.display="none"; instaCanvas.style.display="block";
+    note.textContent="인스타 스토리(9:16) 비율이에요";
+  }
+}));
+
+// 공유 모달
+$("#share").addEventListener("click",()=>{shareMode="insta";drawShareCard();
+  document.querySelectorAll(".share-tab").forEach(x=>x.setAttribute("aria-selected",x.dataset.share==="insta"));
+  document.querySelector("#shareCanvas").style.display="block";
+  document.querySelector("#shareCanvasKakao").style.display="none";
+  document.querySelector("#shareNote").textContent="인스타 스토리(9:16) 비율이에요";
+  $("#modal").classList.add("show");});
+$("#closeModal").addEventListener("click",()=>$("#modal").classList.remove("show"));
+$("#modal").addEventListener("click",e=>{if(e.target.id==="modal")$("#modal").classList.remove("show");});
+$("#dl").addEventListener("click",()=>{
+  const activeCanvas=shareMode==="kakao"?document.querySelector("#shareCanvasKakao"):document.querySelector("#shareCanvas");
+  const fname=shareMode==="kakao"?"talkmirror_kakao.png":"talkmirror_insta.png";
+  const a=document.createElement("a");a.download=fname;a.href=activeCanvas.toDataURL("image/png");a.click();
+});
+
+/* ── 샘플 대화 ── */
+const DEMO=`--------------- 2024년 5월 1일 수요일 ---------------
+[지민] [오후 9:12] 자니?
+[하준] [오후 9:14] 아니 안 자ㅋㅋ 왜
+[지민] [오후 9:14] 그냥 갑자기 생각나서~
+[하준] [오후 9:15] 오 영광인데? 오늘 뭐했어?
+[지민] [오후 9:16] 회사 끝나고 운동 갔다가 지금 누워있어 너는?
+[하준] [오후 9:20] 나도 방금 집 옴 ㅋㅋㅋ 오늘 진짜 피곤했다
+[지민] [오후 9:21] 고생했어 ㅠㅠ 밥은 먹었어?
+[하준] [오후 9:35] 어 대충 먹었어 미안 답장이 늦었네
+[지민] [오후 9:36] 괜찮아~ 천천히 해도 돼
+--------------- 2024년 5월 8일 수요일 ---------------
+[지민] [오후 10:02] 하준아 오늘 그 카페 가봤는데 진짜 좋더라 ㅎㅎ
+[하준] [오후 10:11] 오 어디? 나도 가보고 싶다
+[지민] [오후 10:11] 다음에 같이 가자!! 분위기 완전 너 취향일듯
+[하준] [오후 10:25] 좋지 ㅋㅋ 언제 시간 돼?
+[지민] [오후 10:26] 나는 주말 다 괜찮아 보고싶기도 하고ㅎㅎ
+[하준] [오후 10:40] 그럼 토요일 어때
+[지민] [오후 10:40] 콜!! 벌써 설렌다
+--------------- 2024년 5월 20일 월요일 ---------------
+[지민] [오후 8:30] 잘 들어갔어?
+[하준] [오후 9:15] 어 방금 도착 오늘 진짜 즐거웠어 고마워
+[지민] [오후 9:16] 나도나도 ㅎㅎ 다음에 또 보자
+[하준] [오후 9:40] 그래 잘 자 좋은 꿈 꿔
+[지민] [오후 9:41] 너두❤️`;
+
+refreshGo();
+</script>
+</body>
+</html>
