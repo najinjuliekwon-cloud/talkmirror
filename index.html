@@ -1302,7 +1302,6 @@ function render(R){
   const genre=conversationGenre(R);
   const rx=prescription(R,PURPOSE);
   const recs=nextReplyRecs(R,PURPOSE);
-  const examples=extractExamples(R.conv,A,B);
   LAST={R,rel,buckets,pa,pb,insight};
 
   $("#relBadge").textContent=rel.badge;
@@ -1316,6 +1315,7 @@ function render(R){
     ?(R.temp>=80?"🔥 이거 완전 불나는 거 아님?":R.temp>=65?"☕ 나름 따뜻하네 ㅋ":R.temp>=52?"🤔 음... 미지근?":"🧊 이거 좀 식은 거 아님?")
     :(R.temp>=80?"뜨겁게 끓는 중":R.temp>=65?"따뜻하게 데워진 사이":R.temp>=52?"미지근한 온기":"차분히 가라앉은 상태");
   const P=R.P,A=R.A,B=R.B;
+  const examples=extractExamples(R.conv,A,B);
   const initApct=Math.round(P[A].initiations/R.totalInit*100);
   const msgApct=Math.round(P[A].msgs/R.totalMsg*100);
   const la=P[A].medLat,lb=P[B].medLat;
