@@ -368,6 +368,24 @@
   .reply-item{padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.92)}
   .ri-mode{font-size:10.5px;font-weight:800;letter-spacing:.07em;color:var(--lavender);margin-bottom:4px;text-transform:uppercase}
   .ri-text{font-size:14px;color:var(--text);line-height:1.55}
+
+  /* ── 색상 범례 ── */
+  .colorkey{display:flex;gap:14px;justify-content:center;margin-bottom:10px;font-size:12.5px;font-weight:700}
+  .colorkey .ck{display:flex;align-items:center;gap:5px}
+  .colorkey .ck-dot{width:10px;height:10px;border-radius:50%;flex:none}
+
+  /* ── 관계 추론 근거 ── */
+  .rinf-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+  .rinf-signal{font-size:12.5px;color:var(--text-dim);padding:8px 12px;border-radius:11px;background:rgba(142,124,195,.06);border:1px solid rgba(142,124,195,.12);line-height:1.5}
+
+  /* ── 날짜 하이라이트 ── */
+  .date-sum{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+  .ds-item{padding:12px 14px 10px;border-radius:14px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.90)}
+  .ds-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .ds-date{font-size:13px;font-weight:800;color:var(--text)}
+  .ds-cnt{font-size:11.5px;color:var(--text-faint);margin-left:auto}
+  .ds-temp{font-size:13px;font-weight:800}
+  .ds-temp.t-h{color:var(--coral)} .ds-temp.t-w{color:var(--yellow)} .ds-temp.t-c{color:var(--blue)}
 </style>
 </head>
 <body>
@@ -588,6 +606,7 @@
       <p class="relnote" id="relNote"></p>
       <div id="purposeTag"></div>
       <div class="subnames" id="subnames"></div>
+      <div class="colorkey" id="colorKey"></div>
       <div class="modeswitch" role="tablist" aria-label="결과 말투">
         <button class="mode" data-mode="fun" aria-selected="true">😜 장난 모드</button>
         <button class="mode" data-mode="warm" aria-selected="false">🫶 다정 모드</button>
@@ -888,6 +907,103 @@ function relationshipType(R){
 }
 function trim(n){ return n.length>6?n.slice(0,6)+"…":n; }
 
+/* ── 목적 자동 추론 ── */
+function inferPurpose(R){
+  const{P,A,B,temp,relRomantic}=R;
+  const balance=Math.min(P[A].msgs,P[B].msgs)/Math.max(P[A].msgs,P[B].msgs);
+  const initBal=Math.min(P[A].initiations,P[B].initiations)/Math.max(1,Math.max(P[A].initiations,P[B].initiations));
+  if(relRomantic>0.03&&initBal<0.38) return "effort";
+  if(relRomantic>0.03&&temp>=65) return "interest";
+  if(temp<52) return "cooling";
+  if(balance<0.48) return "effort";
+  return "interest";
+}
+
+/* ── 관계 추론 근거 신호 ── */
+function relInferenceSignals(R,rel){
+  const{P,A,B,temp,relRomantic,totalMsg}=R;
+  const signals=[];
+  const laughter=(P[A].laugh+P[B].laugh)/Math.max(1,totalMsg);
+  const initApct=Math.round(P[A].initiations/R.totalInit*100);
+  const balance=Math.min(P[A].msgs,P[B].msgs)/Math.max(P[A].msgs,P[B].msgs);
+  if(relRomantic>0.04) signals.push("💌 대화에서 설렘·애정 표현이 꽤 자주 등장했어요");
+  if(laughter>0.15) signals.push(`😂 ㅋㅋ·ㅎㅎ가 메시지 10개당 ${(laughter*10).toFixed(1)}번 터졌어요`);
+  if(initApct>70) signals.push(`📱 ${trim(A)}님이 먼저 연락한 비율이 ${initApct}%예요`);
+  else if(initApct<30) signals.push(`📱 ${trim(B)}님이 먼저 연락한 비율이 ${100-initApct}%예요`);
+  const la=P[A].medLat,lb=P[B].medLat;
+  if(la!=null&&la<5) signals.push(`⚡ ${trim(A)}님 평균 답장이 ${fmtMin(la)}으로 빠른 편이에요`);
+  if(lb!=null&&lb<5) signals.push(`⚡ ${trim(B)}님 평균 답장이 ${fmtMin(lb)}으로 빠른 편이에요`);
+  if(R.posPct>72) signals.push(`☀️ 전체 대화의 ${R.posPct}%가 긍정적인 신호였어요`);
+  if(100-R.posPct>40) signals.push(`⚠️ 부정 신호가 ${100-R.posPct}%로 꽤 높은 편이에요`);
+  if(balance<0.5) signals.push(`⚖️ 대화량 차이가 꽤 나요 (${Math.round(balance*100)}% 수준)`);
+  return signals.slice(0,4);
+}
+
+/* ── 날짜별 대화 하이라이트 ── */
+function buildDateSummary(R){
+  if(!R.hasDate) return [];
+  const{conv,A}=R;
+  const days={};
+  conv.forEach(m=>{
+    if(!m.t) return;
+    const d=m.t;
+    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    if(!days[key]) days[key]={date:d,msgs:[],pos:0,neg:0};
+    days[key].msgs.push(m);
+    const s=sentimentOf(m.text); days[key].pos+=s.pos; days[key].neg+=s.neg;
+  });
+  const dayArr=Object.values(days);
+  const scored=dayArr.map(d=>{
+    const tot=d.pos+d.neg;
+    const t=tot?Math.round(42+(d.pos/tot)*48):60;
+    const score=d.msgs.length+(Math.abs(t-60)*0.5);
+    const hi=d.msgs.filter(m=>m.text.length>=4&&m.text.length<=55&&!/사진|동영상|파일|이모티콘|삭제된/.test(m.text));
+    return {dateStr:`${d.date.getMonth()+1}/${d.date.getDate()}`,count:d.msgs.length,temp:t,score,highlights:hi.slice(0,2),who:d};
+  }).sort((a,b)=>b.score-a.score);
+  return scored.slice(0,3);
+}
+
+/* ── 스토리형 호감도 & 성격 분석 ── */
+function storyAnalysis(R,rel){
+  const{P,A,B,temp,totalMsg,relRomantic}=R;
+  const pa=personalityOf(P[A]),pb=personalityOf(P[B]);
+  const laughter=(P[A].laugh+P[B].laugh)/Math.max(1,totalMsg);
+  const initApct=Math.round(P[A].initiations/R.totalInit*100);
+  const balance=Math.min(P[A].msgs,P[B].msgs)/Math.max(P[A].msgs,P[B].msgs);
+  // 호감도 계산 (0~100)
+  const likeA=Math.min(100,Math.round(
+    (P[A].romantic/Math.max(1,P[A].msgs))*200+
+    (P[A].q/Math.max(1,P[A].msgs))*60+
+    (P[A].laugh/Math.max(1,P[A].msgs))*40+
+    (P[A].emoji/Math.max(1,P[A].msgs))*30+
+    (initApct>50?initApct*0.4:0)
+  ));
+  const likeB=Math.min(100,Math.round(
+    (P[B].romantic/Math.max(1,P[B].msgs))*200+
+    (P[B].q/Math.max(1,P[B].msgs))*60+
+    (P[B].laugh/Math.max(1,P[B].msgs))*40+
+    (P[B].emoji/Math.max(1,P[B].msgs))*30+
+    (initApct<50?(100-initApct)*0.4:0)
+  ));
+  // 성격 서술
+  const charA=`${trim(A)}님은 <b>${pa.title}</b> 타입이에요. ${pa.desc} `+
+    (P[A].avgLen>20?"장문을 자주 쓰는 편이라 하고 싶은 말이 많은 스타일이에요.":
+     P[A].avgLen<7?"단답을 선호하지만 그 안에 감정이 압축된 편이에요.":"적당한 길이로 밀도 있게 표현해요.")+
+    (P[A].cushion>2?" 쿠션어를 자주 쓰는 배려형이기도 해요.":"");
+  const charB=`${trim(B)}님은 <b>${pb.title}</b> 타입이에요. ${pb.desc} `+
+    (P[B].avgLen>20?"긴 메시지를 자주 보내는 걸로 보아 표현력이 풍부한 편이에요.":
+     P[B].avgLen<7?"짧고 간결한 답변을 선호하는 스타일이에요.":"균형 잡힌 대화 스타일이에요.")+
+    (P[B].cushion>2?" 상대방을 먼저 생각하는 배려가 메시지에서 보여요.":"");
+  // 관계 서사
+  let story="";
+  if(laughter>0.15&&balance>0.6) story="두 분은 대화만 보면 꽤 잘 맞는 사이예요. 웃음 코드가 비슷하고 주거니 받거니 흐름이 자연스러워요.";
+  else if(relRomantic>0.04&&temp>=65) story="대화 곳곳에 설렘의 조각들이 숨어 있어요. 무의식 중에 이미 마음이 오가고 있는 것 같기도 해요.";
+  else if(initApct>70) story=`${trim(A)}님이 대화를 많이 이끄는 편이에요. 그만큼 이 관계에 신경을 쓰고 있다는 신호일 수 있어요.`;
+  else if(temp<52) story="지금 대화의 온기가 조금 낮은 편이에요. 작은 안부 하나가 관계의 온도를 달궐 수 있어요.";
+  else story="서로 부담 없이 편하게 대화하는 사이로 보여요. 큰 기복 없이 잔잔하게 이어지고 있어요.";
+  return {likeA,likeB,charA,charB,story,paTitle:pa.title,pbTitle:pb.title};
+}
+
 /* ── 목적별 가중 인사이트 ── */
 function purposeInsight(R,purpose){
   const {P,A,B,totalMsg}=R;
@@ -1130,25 +1246,65 @@ function extractExamples(conv,A,B){
   for(let i=1;i<conv.length-1&&ex.filter(e=>e.type==="interest").length<1;i++){
     const m=conv[i],prev=conv[i-1];
     if(m.who===B&&prev.who===A&&/[?？]/.test(m.text)&&ok(m)&&ok(prev))
-      ex.push({type:"interest",msgs:[{who:A,txt:clipTxt(prev.text,38)},{who:B,txt:clipTxt(m.text,38)}],interp:"상대가 내 말을 듣고 질문으로 이어받았어요."});
+      ex.push({type:"interest",msgs:[{who:A,txt:clipTxt(prev.text,40)},{who:B,txt:clipTxt(m.text,40)}],interp:"상대가 내 말을 듣고 질문으로 이어받았어요. 관심의 증거!"});
   }
-  // B→A→B→A ping-pong (at least 4 alternating, all short)
+  // B→A→B→A ping-pong (at least 4 alternating)
   for(let i=0;i<conv.length-3&&ex.filter(e=>e.type==="pingpong").length<1;i++){
     const ms=conv.slice(i,i+4);
     if(ms[0].who!==ms[1].who&&ms[1].who!==ms[2].who&&ms[2].who!==ms[3].who&&ms.every(ok))
-      ex.push({type:"pingpong",msgs:ms.map(m=>({who:m.who,txt:clipTxt(m.text,38)})),interp:"자연스럽게 번갈아가며 대화가 이어졌어요."});
+      ex.push({type:"pingpong",msgs:ms.map(m=>({who:m.who,txt:clipTxt(m.text,40)})),interp:"자연스럽게 번갈아 대화가 이어졌어요. 대화 핑퐁 잘 맞는 편!"});
   }
-  // initiation imbalance: A starts a session (gap>120min), then B's short reply ends it
+  // romantic keyword example
+  for(let i=0;i<conv.length&&ex.filter(e=>e.type==="romantic").length<1;i++){
+    const m=conv[i];
+    if(ok(m)&&romanticScore(m.text)>0&&m.text.length>=4){
+      const next=conv[i+1];
+      const msgs=[{who:m.who,txt:clipTxt(m.text,50)}];
+      if(next&&ok(next)&&next.who!==m.who) msgs.push({who:next.who,txt:clipTxt(next.text,50)});
+      ex.push({type:"romantic",msgs,interp:"설렘 키워드가 담긴 대화예요. 💕"});
+    }
+  }
+  // laugh burst: consecutive messages with ㅋㅋ/ㅎㅎ
+  for(let i=0;i<conv.length-1&&ex.filter(e=>e.type==="laugh").length<1;i++){
+    const m=conv[i],m2=conv[i+1];
+    if(laughCount(m.text)>=2&&laughCount(m2.text)>=2&&ok(m)&&ok(m2)){
+      const msgs=[{who:m.who,txt:clipTxt(m.text,44)},{who:m2.who,txt:clipTxt(m2.text,44)}];
+      if(conv[i+2]&&ok(conv[i+2])&&laughCount(conv[i+2].text)>=1) msgs.push({who:conv[i+2].who,txt:clipTxt(conv[i+2].text,44)});
+      ex.push({type:"laugh",msgs,interp:"웃음이 전염되는 구간이에요. 😂 케미 인증!"});
+    }
+  }
+  // care: 격려·위로 메시지
+  const careW=["괜찮아","다행이다","잘했어","고마워","최고야","힘내","응원","고생","수고","대단"];
+  for(let i=0;i<conv.length&&ex.filter(e=>e.type==="care").length<1;i++){
+    const m=conv[i];
+    if(ok(m)&&careW.some(w=>m.text.includes(w))&&m.text.length>=4){
+      const prev=i>0?conv[i-1]:null;
+      const msgs=prev&&ok(prev)&&prev.who!==m.who?[{who:prev.who,txt:clipTxt(prev.text,44)},{who:m.who,txt:clipTxt(m.text,44)}]:[{who:m.who,txt:clipTxt(m.text,50)}];
+      ex.push({type:"care",msgs,interp:"상대를 챙기고 격려하는 따뜻한 메시지예요. 💚"});
+    }
+  }
+  // positive sentiment example
+  for(let i=0;i<conv.length&&ex.filter(e=>e.type==="posex").length<1;i++){
+    const m=conv[i];
+    const s=sentimentOf(m.text);
+    if(ok(m)&&s.pos>1.8&&m.text.length>=5) ex.push({type:"posex",msgs:[{who:m.who,txt:clipTxt(m.text,52)}],interp:"긍정 신호가 강하게 나타난 메시지예요."});
+  }
+  // negative sentiment example
+  for(let i=0;i<conv.length&&ex.filter(e=>e.type==="negex").length<1;i++){
+    const m=conv[i];
+    const s=sentimentOf(m.text);
+    if(ok(m)&&s.neg>1.8&&m.text.length>=5) ex.push({type:"negex",msgs:[{who:m.who,txt:clipTxt(m.text,52)}],interp:"부정 신호가 감지된 메시지예요."});
+  }
   return ex;
 }
 function latCellHtml(lbl,val,sub,cls=""){return `<div class="lat-cell ${cls}"><div class="lc-lbl">${lbl}</div><div class="lc-val">${fmtMin(val)}</div><div class="lc-sub">${sub}</div></div>`;}
 function latGridFor(p){return `<div class="lat-grid">`+[
-  latCellHtml("최소",p.minLat,"가장 빠른 반응"),
-  latCellHtml("중앙값",p.medLat,"평소 답장 속도","lat-med"),
+  latCellHtml("가장 빠를 때",p.minLat,"최단 답장"),
+  latCellHtml("보통 때",p.medLat,"중앙값 기준","lat-med"),
   latCellHtml("평균",p.avgLat,"전체 평균"),
-  latCellHtml("75th",p.p75Lat,"느린 날 수준"),
-  latCellHtml("90th",p.p90Lat,"꽤 늦는 경우"),
-  latCellHtml("최대",p.maxLat,"가장 긴 공백"),
+  latCellHtml("가끔 느릴 때",p.p75Lat,"상위 25% 기준"),
+  latCellHtml("많이 늦을 때",p.p90Lat,"상위 10% 기준"),
+  latCellHtml("가장 늦을 때",p.maxLat,"최장 공백"),
 ].join("")+`</div>`;}
 function latInterpText(p){
   const r=p.avgLat&&p.medLat?p.avgLat/p.medLat:1;
@@ -1206,14 +1362,14 @@ function trendSVG(b){
     smoothD+=` C ${cpx} ${pts[i-1][1].toFixed(1)} ${cpx} ${pts[i][1].toFixed(1)} ${pts[i][0].toFixed(1)} ${pts[i][1].toFixed(1)}`;
   }
   const fillD=smoothD+` L ${pts[pts.length-1][0].toFixed(1)} ${(padT+ih).toFixed(1)} L ${pts[0][0].toFixed(1)} ${(padT+ih).toFixed(1)} Z`;
-  const dots=pts.map((p,i)=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" fill="#8E7CC3" stroke="#FDFBF7" stroke-width="1.5"/>`).join("");
+  const dots=pts.map((p,i)=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" fill="#F59E0B" stroke="#FDFBF7" stroke-width="1.5"/>`).join("");
   const labels=b.map((d,i)=>`<text x="${x(i).toFixed(1)}" y="${H-7}" font-size="10" fill="#A1A1AA" text-anchor="middle">${esc(d.label)}</text>`).join("");
   return `<svg class="trend" viewBox="0 0 ${W} ${H}" role="img" aria-label="감정 흐름 그래프">
     <defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#8E7CC3" stop-opacity=".16"/><stop offset="100%" stop-color="#8E7CC3" stop-opacity="0"/>
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity=".18"/><stop offset="100%" stop-color="#F59E0B" stop-opacity="0"/>
     </linearGradient></defs>
     ${bars}<path d="${fillD}" fill="url(#tg)"/>
-    <path d="${smoothD}" fill="none" stroke="#8E7CC3" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="${smoothD}" fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round"/>
     ${dots}${labels}</svg>`;
 }
 
@@ -1302,18 +1458,30 @@ function render(R){
   const genre=conversationGenre(R);
   const rx=prescription(R,PURPOSE);
   const recs=nextReplyRecs(R,PURPOSE);
+  const story=storyAnalysis(R,rel);
+  const dateSummary=buildDateSummary(R);
   LAST={R,rel,buckets,pa,pb,insight};
 
   $("#relBadge").textContent=rel.badge;
   $("#relNote").textContent=MODE==="fun"?(rel.noteFun||rel.note):rel.note;
-  $("#subnames").innerHTML=`<b>${esc(R.A)}</b> ✕ <b>${esc(R.B)}</b>`+(R.isGroup?` <span style="color:var(--text-faint)">· 발화량 상위 2명 기준</span>`:"");
+  $("#subnames").innerHTML=`<b style="color:var(--blue)">${esc(R.A)}</b> ✕ <b style="color:var(--coral)">${esc(R.B)}</b>`+(R.isGroup?` <span style="color:var(--text-faint)">· 발화량 상위 2명 기준</span>`:"");
+  document.querySelector("#colorKey").innerHTML=`<span class="ck"><span class="ck-dot" style="background:var(--blue)"></span>${esc(trim(A))} = 보라</span><span class="ck"><span class="ck-dot" style="background:var(--coral)"></span>${esc(trim(B))} = 살구</span>`;
 
-  const purposeNames={interest:"💘 관심 신호",cooling:"🌡️ 온도 변화",effort:"⚖️ 노력 균형",conflict:"🌀 갈등 패턴",style:"🪞 말투 분석"};
-  $("#purposeTag").innerHTML=`<div class="purpose-tag">${purposeNames[PURPOSE]||""} 기준으로 분석했어요</div>`;
+  const infSignals=relInferenceSignals(R,rel);
+  $("#purposeTag").innerHTML=`<div class="purpose-tag">🔍 대화에서 자동 추론했어요</div>${infSignals.length?`<details class="why" style="margin-top:8px"><summary>어떻게 이런 관계로 추론했냐면요? 🧐 <span class="arrow">▾</span></summary><div class="why-body"><div class="rinf-list">${infSignals.map(s=>`<div class="rinf-signal">${esc(s)}</div>`).join("")}</div></div></details>`:""}`;
 
+  const relFriendly=['😆','🌤️','🤝'].includes(rel.emoji);
   const tempDesc=MODE==="fun"
-    ?(R.temp>=80?"🔥 이거 완전 불나는 거 아님?":R.temp>=65?"☕ 나름 따뜻하네 ㅋ":R.temp>=52?"🤔 음... 미지근?":"🧊 이거 좀 식은 거 아님?")
-    :(R.temp>=80?"뜨겁게 끓는 중":R.temp>=65?"따뜻하게 데워진 사이":R.temp>=52?"미지근한 온기":"차분히 가라앉은 상태");
+    ?(R.temp>=80
+      ?(relFriendly?'🔥 케미 완전 폭발 단짝 아닌가요 ㅋㅋ':'🔥 이거 완전 불나는 거 아님?')
+      :R.temp>=65?(relFriendly?'☀️ 텐션도 따뜻함도 다 좋네 ㅋ':'☕ 나름 따뜻하네 ㅋ')
+      :R.temp>=52?'🤔 음... 미지근?'
+      :'🧊 이거 좀 식은 거 아님?')
+    :(R.temp>=80
+      ?(relFriendly?'활발하고 따뜻한 사이':'뜨겁게 끓는 중')
+      :R.temp>=65?'따뜻하게 데워진 사이'
+      :R.temp>=52?'미지근한 온기'
+      :'차분히 가라앉은 상태');
   const P=R.P,A=R.A,B=R.B;
   const examples=extractExamples(R.conv,A,B);
   const initApct=Math.round(P[A].initiations/R.totalInit*100);
@@ -1335,7 +1503,8 @@ function render(R){
   const pwCard=pwIns.text?`<div class="pw-insight"><div class="pw-label">${esc(pwIns.label)}</div>${pwIns.text}</div>`:"";
 
   // 이스터에그
-  const eggHtml=eggs.length?`<div class="egg-strip">${eggs.map(e=>`<div class="egg"><b>관찰됨</b> ${esc(e)}</div>`).join("")}</div>`:"";
+  const laughExs=examples.filter(e=>e.type==="laugh");
+  const eggHtml=eggs.length?`<div class="egg-strip">${eggs.map(e=>`<div class="egg"><b>관찰됨</b> ${esc(e)}</div>`).join("")}</div>${laughExs.length?`<details class="why" style="margin-top:10px"><summary>😂 웃음 터진 대화 직접 보기 <span class="arrow">▾</span></summary><div class="why-body">${exHtml(laughExs,A)}</div></details>`:""}`:"";
 
   // 남들이 보면
   const outsiderHtml=`<div class="outsider">
@@ -1369,6 +1538,8 @@ function render(R){
             <li><span>웃음·설렘 표현</span><b>${R.posSignals.length?"있음":"적음"}</b></li>
           </ul>
           <div class="why-interp">긍정어·부정어 가중치 합산 비율로 42°~97° 범위를 환산해요. 웃음, 설렘 표현은 긍정 / 부정어·회피 표현은 부정으로 집계됩니다.</div>
+          ${examples.filter(e=>e.type==="posex").length?`<div class="ex-label" style="margin-top:10px">긍정 신호 대화 예시</div>${exHtml(examples.filter(e=>e.type==="posex"),A)}`:""}
+          ${examples.filter(e=>e.type==="negex").length?`<div class="ex-label" style="margin-top:8px">부정 신호 대화 예시</div>${exHtml(examples.filter(e=>e.type==="negex"),A)}`:""}
         </div>
       </details></div>`,
 
@@ -1420,17 +1591,56 @@ function render(R){
     // 5. 트렌드
     `<div class="glass card"><h3><span class="dot"></span>시간에 따른 감정 흐름</h3>
       <div class="chartbox">${trendSVG(buckets)}</div>
-      <div class="legend"><span><i style="background:#34D399"></i>긍정 우세</span><span><i style="background:#F87171"></i>부정 우세</span><span><i style="background:#FBBF24;height:8px;width:8px;border-radius:50%"></i>감정 온도</span></div>
+      <div class="legend"><span><i style="background:#34D399"></i>긍정 우세 구간</span><span><i style="background:#F87171"></i>부정 우세 구간</span><span><i style="background:#F59E0B"></i>감정 온도 추이</span></div>
       <div class="insight">${insight}</div></div>`,
 
     // 6. 이스터에그
     eggHtml?`<div class="glass card"><h3><span class="dot"></span>대화에서 포착된 것들</h3>${eggHtml}</div>`:"",
+
+    // 6.5 날짜별 하이라이트
+    dateSummary.length?`<div class="glass card"><h3><span class="dot"></span>날짜별 대화 하이라이트</h3>
+      <div class="date-sum">${dateSummary.map(d=>{
+        const tcls=d.temp>=68?'t-h':d.temp>=52?'t-w':'t-c';
+        return `<div class="ds-item">
+          <div class="ds-head">
+            <span class="ds-date">📅 ${esc(d.dateStr)}</span>
+            <span class="ds-cnt">${d.count}개</span>
+            <span class="ds-temp ${tcls}">${d.temp}°</span>
+          </div>
+          <div class="chat-log">${d.highlights.map(m=>`<div class="cb ${m.who===A?"r":""}"><span class="cb-who">${esc(trim(m.who))}</span><div class="cb-txt">${esc(clipTxt(m.text,50))}</div></div>`).join("")}</div>
+        </div>`;}).join("")}
+      </div>
+      <p style="margin-top:10px;font-size:11.5px;color:var(--text-faint)">메시지 수·감정 온도가 높은 날짜를 자동으로 골라냈어요.</p>
+    </div>`:"",
+
+    // 6.7 스토리형 성격 & 호감도 분석
+    `<div class="glass card"><h3><span class="dot"></span>대화로 읽는 두 사람 이야기</h3>
+      <div style="font-size:13.5px;color:var(--text);line-height:1.75;margin-bottom:14px">${story.story}</div>
+      <div class="ptype" style="margin-bottom:16px">
+        <div class="pcard a" style="padding:14px 12px">
+          <div class="who">${esc(trim(A))}</div>
+          <div class="ptitle" style="font-size:14px;margin:4px 0 6px">${esc(story.paTitle)}</div>
+          <div class="pdesc" style="font-size:12px">${story.charA}</div>
+        </div>
+        <div class="pcard b" style="padding:14px 12px">
+          <div class="who">${esc(trim(B))}</div>
+          <div class="ptitle" style="font-size:14px;margin:4px 0 6px">${esc(story.pbTitle)}</div>
+          <div class="pdesc" style="font-size:12px">${story.charB}</div>
+        </div>
+      </div>
+      <h3 style="font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--text-dim);margin-bottom:12px;display:flex;align-items:center;gap:7px"><span class="dot" style="background:var(--coral);box-shadow:0 0 8px var(--coral)"></span>호감도 (대화 패턴 기반)</h3>
+      <div class="flirt-row"><span class="fl-name" style="color:var(--blue)">${esc(trim(A))}</span><div class="flirt-bar"><div class="flirt-fill" style="width:${story.likeA}%;background:linear-gradient(90deg,var(--blue),var(--lavender))"></div></div><span class="fl-pct" style="color:var(--blue)">${story.likeA}</span></div>
+      <div class="flirt-row"><span class="fl-name" style="color:var(--coral)">${esc(trim(B))}</span><div class="flirt-bar"><div class="flirt-fill" style="width:${story.likeB}%;background:linear-gradient(90deg,var(--coral),#FCA5A5)"></div></div><span class="fl-pct">${story.likeB}</span></div>
+      <p style="margin-top:8px;font-size:11.5px;color:var(--text-faint);line-height:1.6">설렘·질문·리액션·선톡 빈도를 종합한 재미 지수예요. 절대적인 수치가 아닌 참고용으로 봐주세요 :)</p>
+      ${examples.filter(e=>e.type==="care").length?`<details class="why" style="margin-top:10px"><summary>💚 따뜻한 케어 대화 보기 <span class="arrow">▾</span></summary><div class="why-body">${exHtml(examples.filter(e=>e.type==="care"),A)}</div></details>`:""}
+    </div>`,
 
     // 7. 기간 비교 + 설렘 밀도
     (()=>{
       const tcls=t=>t>=68?"ph-hot":t>=52?"ph-warm":"ph-cool";
       const dcls=pc.delta>=5?"d-up":pc.delta<=-5?"d-down":"d-flat";
       const dtxt=pc.delta>=5?`▲ ${pc.delta}° 따뜻해졌어요`:pc.delta<=-5?`▼ ${Math.abs(pc.delta)}° 식었어요`:"→ 큰 변화 없어요";
+      const romanticExs=examples.filter(e=>e.type==="romantic");
       return `<div class="glass card"><h3><span class="dot"></span>초반 vs 최근 온도 변화</h3>
         <div class="period-cmp">
           <div class="period-half"><div class="ph-label">초반</div><div class="ph-temp ${tcls(pc.t1)}">${pc.t1}°</div></div>
@@ -1439,9 +1649,10 @@ function render(R){
         </div>
         <div style="text-align:center;margin-top:12px"><span class="delta-pill ${dcls}">${dtxt}</span></div>
         <h3 style="margin-top:18px"><span class="dot" style="background:var(--coral);box-shadow:0 0 8px var(--coral)"></span>설렘 밀도</h3>
-        <div class="flirt-row"><span class="fl-name">${esc(trim(A))}</span><div class="flirt-bar"><div class="flirt-fill" style="width:${fd.A}%"></div></div><span class="fl-pct">${fd.A}</span></div>
-        <div class="flirt-row"><span class="fl-name">${esc(trim(B))}</span><div class="flirt-bar"><div class="flirt-fill" style="width:${fd.B}%"></div></div><span class="fl-pct">${fd.B}</span></div>
-        <p style="margin-top:8px;font-size:11.5px;color:var(--text-faint)">설렘 표현·이모티콘·질문·웃음을 종합한 지수예요.</p>
+        <p style="font-size:12px;color:var(--text-faint);margin-bottom:10px">설렘 표현·이모지·질문·웃음을 종합한 지수예요 (0~100)</p>
+        <div class="flirt-row"><span class="fl-name" style="color:var(--blue)">${esc(trim(A))}</span><div class="flirt-bar"><div class="flirt-fill" style="width:${fd.A}%"></div></div><span class="fl-pct">${fd.A}</span></div>
+        <div class="flirt-row"><span class="fl-name" style="color:var(--coral)">${esc(trim(B))}</span><div class="flirt-bar"><div class="flirt-fill" style="width:${fd.B}%"></div></div><span class="fl-pct">${fd.B}</span></div>
+        ${romanticExs.length?`<details class="why" style="margin-top:10px"><summary>💕 설렘 키워드 대화 직접 보기 <span class="arrow">▾</span></summary><div class="why-body">${exHtml(romanticExs,A)}</div></details>`:""}
       </div>`;
     })(),
 
@@ -1540,6 +1751,7 @@ function runAnalysis(raw){
   const t2=setTimeout(()=>setStage(2),3400);
   setTimeout(()=>{
     clearInterval(quoteIv);clearTimeout(t1);clearTimeout(t2);
+    PURPOSE=inferPurpose(R);
     render(R);show("report");window.scrollTo(0,0);
   },5200);
 }
@@ -1619,7 +1831,7 @@ function loadFile(f){
 }
 
 // landing → purpose
-go.addEventListener("click",()=>show("purpose-screen"));
+go.addEventListener("click",()=>{const raw=inputMode==="paste"?ta.value:fileText;runAnalysis(raw);});
 $("#demo").addEventListener("click",()=>{PURPOSE="interest";runAnalysis(DEMO);});
 $("#backToLanding").addEventListener("click",()=>show("landing"));
 
