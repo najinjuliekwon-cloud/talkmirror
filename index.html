@@ -112,20 +112,13 @@
   .ghost{background:rgba(255,255,255,.82);border:1px solid var(--line-b);color:var(--text-dim);font:inherit;font-weight:700;font-size:14px;padding:12px 16px;border-radius:12px;cursor:pointer;transition:.2s;backdrop-filter:blur(8px)}
   .ghost:hover{color:var(--text);border-color:var(--blue);background:rgba(255,255,255,.96)}
 
-  /* ---- purpose screen ---- */
-  #purpose-screen .purpose-q{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;line-height:1.3}
-  #purpose-screen .purpose-sub{color:var(--text-dim);font-size:14px;margin-bottom:24px}
-  .purpose-list{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
-  .pc{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:16px;background:rgba(255,255,255,.75);border:1.5px solid rgba(255,255,255,.92);cursor:pointer;transition:.2s;text-align:left;width:100%;font:inherit;color:var(--text);box-shadow:0 2px 12px -4px rgba(0,0,0,.07)}
-  .pc:hover{border-color:var(--blue);background:rgba(142,124,195,.08)}
-  .pc[aria-selected="true"]{border-color:var(--blue);background:rgba(142,124,195,.11);box-shadow:0 0 0 3px rgba(142,124,195,.16)}
-  .pc .pi{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none;font-size:20px;background:rgba(142,124,195,.12)}
-  .pc[aria-selected="true"] .pi{background:rgba(142,124,195,.24)}
-  .pc .pt{font-weight:700;font-size:15px;margin-bottom:2px}
-  .pc .pd{font-size:12.5px;color:var(--text-dim);line-height:1.45}
-  .back{background:none;border:0;color:var(--text-faint);font:inherit;font-size:13.5px;cursor:pointer;display:flex;align-items:center;gap:5px;padding:0;margin-bottom:20px}
-  .back:hover{color:var(--text)}
-  .back svg{width:16px;height:16px}
+  /* ── 대화 MBTI 뱃지 ── */
+  .mbti-badge{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.06em;padding:3px 8px;border-radius:6px;background:rgba(142,124,195,.12);color:var(--blue);margin-bottom:5px}
+  .pcard.b .mbti-badge{background:rgba(248,113,113,.10);color:var(--coral)}
+  /* ── 베스트 케미 구간 ── */
+  .best-chem{padding:14px 16px;border-radius:16px;background:linear-gradient(110deg,rgba(248,113,113,.07),rgba(142,124,195,.07));border:1px solid rgba(142,124,195,.18);margin-top:6px}
+  .bc-label{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--coral);margin-bottom:8px}
+  .bc-desc{font-size:12.5px;color:var(--text-dim);line-height:1.65;margin-top:8px;font-style:italic}
 
   /* ---- loading ---- */
   #loading{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;padding:28px 16px;gap:0;background:linear-gradient(150deg,#EDEAF5 0%,#E5E0F2 60%,#EAE5F4 100%)}
@@ -478,46 +471,6 @@
   </div>
 </section>
 
-<!-- ===== PURPOSE SELECTION ===== -->
-<section class="screen" id="purpose-screen">
-  <div class="wrap">
-    <div class="brand" style="justify-content:flex-start;margin-bottom:20px">
-      <button class="back" id="backToLanding">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        뒤로
-      </button>
-    </div>
-
-    <p class="purpose-q">어떤 기준으로<br>비춰드릴까요?</p>
-    <p class="purpose-sub">선택하신 목적에 따라 분석 가중치가 달라져요.</p>
-
-    <div class="purpose-list" id="purposeList">
-      <button class="pc" data-purpose="interest" aria-selected="false">
-        <span class="pi">💘</span>
-        <div><div class="pt">이 사람이 나한테 관심 있는지 궁금해요</div><div class="pd">질문·대화 확장·답장 패턴 중심 분석</div></div>
-      </button>
-      <button class="pc" data-purpose="cooling" aria-selected="false">
-        <span class="pi">🌡️</span>
-        <div><div class="pt">요즘 관계가 식었는지 알고 싶어요</div><div class="pd">기간별 온도 변화·애정 표현 감소 분석</div></div>
-      </button>
-      <button class="pc" data-purpose="effort" aria-selected="false">
-        <span class="pi">⚖️</span>
-        <div><div class="pt">나만 너무 노력 중인지 알고 싶어요</div><div class="pd">선톡·발화량·대화 복구 균형 분석</div></div>
-      </button>
-      <button class="pc" data-purpose="conflict" aria-selected="false">
-        <span class="pi">🌀</span>
-        <div><div class="pt">싸움/오해 패턴을 보고 싶어요</div><div class="pd">부정어·회피·화제 전환 패턴 분석</div></div>
-      </button>
-      <button class="pc" data-purpose="style" aria-selected="false">
-        <span class="pi">🪞</span>
-        <div><div class="pt">내 말투 유형이 궁금해요</div><div class="pd">쿠션어·감정 표현·질문 방식 중심 분석</div></div>
-      </button>
-    </div>
-
-    <button class="cta" id="startAnalysis" disabled>이 기준으로 분석하기</button>
-  </div>
-</section>
-
 <!-- ===== LOADING ===== -->
 <section id="loading" aria-live="polite">
   <!-- Prism + light refraction scene -->
@@ -841,16 +794,16 @@ function personalityOf(p){
   const top=Object.keys(s).sort((a,b)=>s[b]-s[a])[0];
   const I=(d)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
   const M={
-    react:["감정 풍부한 리액션봇","이모티콘과 감탄사로 대화에 색을 입히는 분위기 메이커",I('<path d="M12 21s-7-4.6-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.4-7 10-7 10Z"/>')],
-    fact:["신중한 팩트체크형","문장이 길고 마침표가 또박또박, 할 말을 정확히 전하는 스타일",I('<circle cx="11" cy="11" r="6"/><path d="m20 20-3.5-3.5"/><path d="m9 11 1.5 1.5L14 9"/>')],
-    care:["다정다감 케어형","상대를 먼저 챙기고 질문으로 마음을 살피는 따뜻한 사람",I('<path d="M7 11V7a2 2 0 0 1 4 0v4"/><path d="M11 11V5.5a2 2 0 0 1 4 0V11"/><path d="M15 11V8a2 2 0 0 1 4 0v6a6 6 0 0 1-6 6h-2a6 6 0 0 1-5.7-4.1L4 14"/>')],
-    cool:["쿨한 단답 미니멀리스트","짧고 담백하게, 핵심만 던지는 타입",I('<path d="M4 9h16"/><path d="M4 15h10"/>')],
-    tension:["텐션 폭발 분위기메이커","ㅋㅋ가 끊이지 않는, 대화 에너지를 끌어올리는 사람",I('<path d="m13 2-9 12h7l-2 8 9-12h-7l2-8Z"/>')],
-    longExplain:["장문 해명러","짧은 오해도 2000자로 설명하는, 진심을 끝까지 전달하는 타입",I('<path d="M4 6h16M4 10h16M4 14h10M4 18h6"/><circle cx="18" cy="17" r="3"/>')],
-    socialEngine:["관계 엔진형","먼저 연락하고 질문으로 대화를 이끄는, 관계의 주도자",I('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>')],
-    pretendCool:["쿨한 척 과몰입러","단답을 치고 있지만 사실 마음이 넘치는, 절제미 넘치는 감성파",I('<path d="M12 2 15.09 8.26 22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/>')]
+    react:{title:"리액션 국가대표 🎭",mbti:"E형 감성파",desc:"ㅋㅋ ㄷㄷ ㅎㅎ 이모티콘으로 모든 감정을 표현하는 타입. 당신 덕분에 대화방 분위기가 살아있어요. 없으면 허전한 사람.",icon:I('<path d="M12 21s-7-4.6-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.4-7 10-7 10Z"/>')},
+    fact:{title:"T형 정론파 📎",mbti:"T형 논리파",desc:"마침표 하나도 빠뜨리지 않고 할 말을 정확하게 전달하는 스타일. 속으로 '그래서 결론이 뭐야?'를 외치는 사람.",icon:I('<circle cx="11" cy="11" r="6"/><path d="m20 20-3.5-3.5"/><path d="m9 11 1.5 1.5L14 9"/>')},
+    care:{title:"엄마미소 담당 💚",mbti:"F형 배려파",desc:"상대가 힘들어 보이면 제일 먼저 눈치채는 사람. 질문과 배려로 대화를 따뜻하게 감싸줘요. 주변에 꼭 한 명 있어야 하는 유형.",icon:I('<path d="M7 11V7a2 2 0 0 1 4 0v4"/><path d="M11 11V5.5a2 2 0 0 1 4 0V11"/><path d="M15 11V8a2 2 0 0 1 4 0v6a6 6 0 0 1-6 6h-2a6 6 0 0 1-5.7-4.1L4 14"/>')},
+    cool:{title:"말 아끼는 찰진 단답러 🫠",mbti:"I형 미니멀",desc:"2글자로 모든 감정을 압축하는 고수. 짧지만 그 안에 뭔가 있어요. 해석이 필요한 타입. 이 사람 답장 받으면 혼자 분석하게 됨.",icon:I('<path d="M4 9h16"/><path d="M4 15h10"/>')},
+    tension:{title:"텐션 핵폭탄 💥",mbti:"E형 텐션왕",desc:"대화방에 들어오면 에너지가 달라지는 사람. ㅋㅋ 하나로 분위기를 순식간에 바꿔놓아요. 없으면 대화가 무거워짐.",icon:I('<path d="m13 2-9 12h7l-2 8 9-12h-7l2-8Z"/>')},
+    longExplain:{title:"설명 장인 📜",mbti:"J형 서술형",desc:"오해받기 싫어서 3문단짜리 답장을 보내는 타입. 진심을 끝까지 전달하는 노력파. 읽는 데만 3분 걸리지만 그 진심이 느껴져요.",icon:I('<path d="M4 6h16M4 10h16M4 14h10M4 18h6"/><circle cx="18" cy="17" r="3"/>')},
+    socialEngine:{title:"먼저 문 두드리는 사람 🚪",mbti:"E형 리더",desc:"잠수타면 제일 먼저 연락 오는 그 사람. 질문으로 대화를 이끌고 관계를 놓지 않는 주도형. 이 사람 없으면 연락 두절.",icon:I('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>')},
+    pretendCool:{title:"T인 척하는 숨은 F 🫣",mbti:"F형 츤데레",desc:"단답 치는데 이모티콘은 꼭 붙이는 모순의 아이콘. 관심 없는 척하지만 속은 다 알고 있어요. 이 사람 공략법: 먼저 물어봐주기.",icon:I('<path d="M12 2 15.09 8.26 22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/>')}
   };
-  return {key:top,title:M[top][0],desc:M[top][1],icon:M[top][2]};
+  return {key:top,...M[top]};
 }
 
 /* ── 관계 유형 (스펙 Section 10.1 기반) ── */
@@ -919,23 +872,49 @@ function inferPurpose(R){
   return "interest";
 }
 
-/* ── 관계 추론 근거 신호 ── */
+/* ── 관계 추론 근거 — 서사형 ── */
 function relInferenceSignals(R,rel){
   const{P,A,B,temp,relRomantic,totalMsg}=R;
   const signals=[];
   const laughter=(P[A].laugh+P[B].laugh)/Math.max(1,totalMsg);
   const initApct=Math.round(P[A].initiations/R.totalInit*100);
   const balance=Math.min(P[A].msgs,P[B].msgs)/Math.max(P[A].msgs,P[B].msgs);
-  if(relRomantic>0.04) signals.push("💌 대화에서 설렘·애정 표현이 꽤 자주 등장했어요");
-  if(laughter>0.15) signals.push(`😂 ㅋㅋ·ㅎㅎ가 메시지 10개당 ${(laughter*10).toFixed(1)}번 터졌어요`);
-  if(initApct>70) signals.push(`📱 ${trim(A)}님이 먼저 연락한 비율이 ${initApct}%예요`);
-  else if(initApct<30) signals.push(`📱 ${trim(B)}님이 먼저 연락한 비율이 ${100-initApct}%예요`);
   const la=P[A].medLat,lb=P[B].medLat;
-  if(la!=null&&la<5) signals.push(`⚡ ${trim(A)}님 평균 답장이 ${fmtMin(la)}으로 빠른 편이에요`);
-  if(lb!=null&&lb<5) signals.push(`⚡ ${trim(B)}님 평균 답장이 ${fmtMin(lb)}으로 빠른 편이에요`);
-  if(R.posPct>72) signals.push(`☀️ 전체 대화의 ${R.posPct}%가 긍정적인 신호였어요`);
-  if(100-R.posPct>40) signals.push(`⚠️ 부정 신호가 ${100-R.posPct}%로 꽤 높은 편이에요`);
-  if(balance<0.5) signals.push(`⚖️ 대화량 차이가 꽤 나요 (${Math.round(balance*100)}% 수준)`);
+
+  // 설렘 신호 — 서사형
+  if(relRomantic>0.06)
+    signals.push(`💌 '보고싶다', '자기야' 같은 설렘 표현이 대화에서 꽤 많이 터져나왔어요. 이게 다 우연일 리 없잖아요?`);
+  else if(relRomantic>0.02)
+    signals.push(`💌 가끔씩 슬쩍 튀어나오는 설렘 표현들... 의식한 건지, 무의식인지는 본인만 알겠죠 ㅎ`);
+
+  // 웃음 신호
+  if(laughter>0.20)
+    signals.push(`😂 ㅋㅋ·ㅎㅎ가 대화방을 거의 장악했어요. 웃음 코드가 이렇게 잘 맞는 사이, 흔하지 않아요.`);
+  else if(laughter>0.12)
+    signals.push(`😄 대화 중간중간 웃음이 자주 터졌어요. 같이 있으면 재밌는 사이인 게 분명해요.`);
+
+  // 선톡 신호
+  if(initApct>72)
+    signals.push(`📱 ${trim(A)}님이 대화를 먼저 시작하는 비율이 ${initApct}%예요. 이 정도면 머릿속에 상대가 꽤 자주 떠오르는 거겠죠?`);
+  else if(initApct<28)
+    signals.push(`📱 ${trim(B)}님이 대화를 먼저 여는 경우가 훨씬 많아요. 관계에서 적극적인 쪽이 어딘지 보이네요.`);
+
+  // 답장 속도
+  if(la!=null&&la<4)
+    signals.push(`⚡ ${trim(A)}님 평균 답장이 ${fmtMin(la)}이에요. 이 속도면 폰을 손에서 놓기 싫은 대화라는 뜻 아닐까요 ㅋ`);
+  if(lb!=null&&lb<4)
+    signals.push(`⚡ ${trim(B)}님도 평균 ${fmtMin(lb)}만에 답해요. 기다리게 안 하는 사람, 그만큼 신경 쓴다는 거죠.`);
+
+  // 감정 온도
+  if(R.posPct>75)
+    signals.push(`☀️ 대화의 ${R.posPct}%가 긍정 에너지로 가득 찼어요. 같이 있으면 기분이 좋아지는 사이인 거 확실해요.`);
+  else if(100-R.posPct>42)
+    signals.push(`⚠️ 부정적 감정 표현이 좀 있어요. 솔직하게 털어놓는 관계이거나, 갈등이 있는 구간일 수 있어요.`);
+
+  // 균형
+  if(balance<0.48)
+    signals.push(`⚖️ 한쪽이 대화를 훨씬 많이 이끌고 있어요. 노력의 균형이 약간 기울어져 있는 상태예요.`);
+
   return signals.slice(0,4);
 }
 
@@ -1002,6 +981,31 @@ function storyAnalysis(R,rel){
   else if(temp<52) story="지금 대화의 온기가 조금 낮은 편이에요. 작은 안부 하나가 관계의 온도를 달궐 수 있어요.";
   else story="서로 부담 없이 편하게 대화하는 사이로 보여요. 큰 기복 없이 잔잔하게 이어지고 있어요.";
   return {likeA,likeB,charA,charB,story,paTitle:pa.title,pbTitle:pb.title};
+}
+
+/* ── 베스트 케미 구간 ── */
+function bestChemSegment(R){
+  const{conv,A,B}=R;
+  if(conv.length<8) return null;
+  const W=6,ok=m=>m.text&&m.text.length>=2&&!/사진|동영상|파일|이모티콘|삭제된/.test(m.text);
+  let best={score:-1,idx:0};
+  for(let i=0;i<=conv.length-W;i++){
+    const seg=conv.slice(i,i+W);
+    if(new Set(seg.map(m=>m.who)).size<2) continue;
+    let alt=0; for(let j=1;j<seg.length;j++) if(seg[j].who!==seg[j-1].who) alt++;
+    if(alt<W-3) continue;
+    const sc=seg.reduce((acc,m)=>{
+      const s=sentimentOf(m.text);
+      return acc+s.pos*1.2-s.neg*0.5+laughCount(m.text)*1.2+romanticScore(m.text)*2;
+    },0);
+    if(sc>best.score){best={score:sc,idx:i};}
+  }
+  if(best.score<1) return null;
+  const seg=conv.slice(best.idx,best.idx+W);
+  const msgs=seg.filter(ok).slice(0,4).map(m=>({who:m.who,txt:clipTxt(m.text,44)}));
+  const dateStr=seg[0].t?`${seg[0].t.getMonth()+1}/${seg[0].t.getDate()}`:"";
+  const score=Math.min(100,Math.round(best.score*8));
+  return {msgs,dateStr,score};
 }
 
 /* ── 목적별 가중 인사이트 ── */
@@ -1460,6 +1464,7 @@ function render(R){
   const recs=nextReplyRecs(R,PURPOSE);
   const story=storyAnalysis(R,rel);
   const dateSummary=buildDateSummary(R);
+  const bestChem=bestChemSegment(R);
   LAST={R,rel,buckets,pa,pb,insight};
 
   $("#relBadge").textContent=rel.badge;
@@ -1468,7 +1473,7 @@ function render(R){
   document.querySelector("#colorKey").innerHTML=`<span class="ck"><span class="ck-dot" style="background:var(--blue)"></span>${esc(trim(A))} = 보라</span><span class="ck"><span class="ck-dot" style="background:var(--coral)"></span>${esc(trim(B))} = 살구</span>`;
 
   const infSignals=relInferenceSignals(R,rel);
-  $("#purposeTag").innerHTML=`<div class="purpose-tag">🔍 대화에서 자동 추론했어요</div>${infSignals.length?`<details class="why" style="margin-top:8px"><summary>어떻게 이런 관계로 추론했냐면요? 🧐 <span class="arrow">▾</span></summary><div class="why-body"><div class="rinf-list">${infSignals.map(s=>`<div class="rinf-signal">${esc(s)}</div>`).join("")}</div></div></details>`:""}`;
+  $("#purposeTag").innerHTML=`<div class="purpose-tag">🪞 톡미러가 대화 전체를 읽었어요</div>${infSignals.length?`<details class="why" style="margin-top:8px"><summary>이렇게 추론한 근거, 궁금하지 않아요? 🧐 <span class="arrow">▾</span></summary><div class="why-body"><div class="rinf-list">${infSignals.map(s=>`<div class="rinf-signal">${esc(s)}</div>`).join("")}</div><div class="why-interp" style="margin-top:8px">이 신호들을 종합해서 관계 유형을 판단했어요. 100% 맞진 않지만, 꽤 비슷하지 않나요?</div></div></details>`:""}`;
 
   const relFriendly=['😆','🌤️','🤝'].includes(rel.emoji);
   const tempDesc=MODE==="fun"
@@ -1544,10 +1549,10 @@ function render(R){
       </details></div>`,
 
     // 2. 소통 성향
-    `<div class="glass card"><h3><span class="dot"></span>소통 성향</h3>
+    `<div class="glass card"><h3><span class="dot"></span>대화 속 말투 유형</h3>
       <div class="ptype">
-        <div class="pcard a"><div class="picon">${pa.icon}</div><div class="who">${esc(trim(A))}</div><div class="ptitle">${pa.title}</div><div class="pdesc">${pa.desc}</div></div>
-        <div class="pcard b"><div class="picon">${pb.icon}</div><div class="who">${esc(trim(B))}</div><div class="ptitle">${pb.title}</div><div class="pdesc">${pb.desc}</div></div>
+        <div class="pcard a"><div class="picon">${pa.icon}</div><div class="who">${esc(trim(A))}</div><div class="mbti-badge">${esc(pa.mbti||"")}</div><div class="ptitle">${pa.title}</div><div class="pdesc">${pa.desc}</div></div>
+        <div class="pcard b"><div class="picon">${pb.icon}</div><div class="who">${esc(trim(B))}</div><div class="mbti-badge">${esc(pb.mbti||"")}</div><div class="ptitle">${pb.title}</div><div class="pdesc">${pb.desc}</div></div>
       </div>
       <details class="why"><summary>왜 이 성향이 나왔나요? <span class="arrow">▾</span></summary>
         <div class="why-body">
@@ -1611,6 +1616,15 @@ function render(R){
         </div>`;}).join("")}
       </div>
       <p style="margin-top:10px;font-size:11.5px;color:var(--text-faint)">메시지 수·감정 온도가 높은 날짜를 자동으로 골라냈어요.</p>
+    </div>`:"",
+
+    // 6.6 베스트 케미 구간
+    bestChem?`<div class="glass card"><h3><span class="dot"></span>✨ 두 분의 케미가 제일 폭발한 순간</h3>
+      <div class="best-chem">
+        <div class="bc-label">BEST CHEMISTRY ${bestChem.dateStr?`· ${bestChem.dateStr}`:""} · 케미 점수 ${bestChem.score}</div>
+        <div class="chat-log">${bestChem.msgs.map(m=>`<div class="cb ${m.who===A?"r":""}"><span class="cb-who">${esc(trim(m.who))}</span><div class="cb-txt">${esc(m.txt)}</div></div>`).join("")}</div>
+        <div class="bc-desc">웃음·설렘·핑퐁이 동시에 가장 잘 맞았던 구간이에요. 이런 순간이 많을수록 좋은 사이라는 증거죠. 💫</div>
+      </div>
     </div>`:"",
 
     // 6.7 스토리형 성격 & 호감도 분석
@@ -1830,22 +1844,8 @@ function loadFile(f){
   });
 }
 
-// landing → purpose
 go.addEventListener("click",()=>{const raw=inputMode==="paste"?ta.value:fileText;runAnalysis(raw);});
-$("#demo").addEventListener("click",()=>{PURPOSE="interest";runAnalysis(DEMO);});
-$("#backToLanding").addEventListener("click",()=>show("landing"));
-
-// purpose 선택
-document.querySelectorAll(".pc").forEach(btn=>btn.addEventListener("click",()=>{
-  document.querySelectorAll(".pc").forEach(x=>x.setAttribute("aria-selected","false"));
-  btn.setAttribute("aria-selected","true");
-  PURPOSE=btn.dataset.purpose;
-  $("#startAnalysis").disabled=false;
-}));
-$("#startAnalysis").addEventListener("click",()=>{
-  const raw=inputMode==="paste"?ta.value:fileText;
-  runAnalysis(raw);
-});
+$("#demo").addEventListener("click",()=>{runAnalysis(DEMO);});
 
 $("#restart").addEventListener("click",()=>{show("landing");window.scrollTo(0,0);});
 
