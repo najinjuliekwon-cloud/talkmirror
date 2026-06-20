@@ -3,29 +3,32 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="color-scheme" content="dark" />
+<meta name="color-scheme" content="light" />
 <title>톡미러 · 대화가 비추는 우리의 진짜 온도</title>
 <meta name="description" content="카카오톡 대화를 붙여넣거나 파일로 올리면 관계 유형·감정 온도·소통 성향을 분석해 드려요. 모든 분석은 브라우저 안에서만 일어납니다." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#111827;
-    --surface:#1F2937;
-    --surface2:#374151;
-    --blue:#6C8CFF;
-    --blue-dim:#4B6FE8;
-    --lavender:#A78BFA;
-    --coral:#FF7A90;
-    --warm:#FF8A5B;
-    --green:#34D399;
-    --yellow:#FBBF24;
-    --red:#F87171;
-    --text:#F9FAFB;
-    --text-dim:#9CA3AF;
-    --text-faint:#6B7280;
-    --glass:rgba(255,255,255,.05);
-    --glass-b:rgba(255,255,255,.09);
-    --line:rgba(255,255,255,.10);
-    --line-b:rgba(255,255,255,.16);
+    --bg:#FDFBF7;
+    --surface:rgba(255,255,255,.82);
+    --surface2:rgba(255,255,255,.96);
+    --blue:#8E7CC3;
+    --blue-dim:#7060AB;
+    --lavender:#B4A8DC;
+    --coral:#F87171;
+    --warm:#FB923C;
+    --green:#10B981;
+    --yellow:#F59E0B;
+    --red:#EF4444;
+    --text:#2C2C2C;
+    --text-dim:#5C5C6E;
+    --text-faint:#A1A1AA;
+    --glass:rgba(255,255,255,.75);
+    --glass-b:rgba(255,255,255,.94);
+    --line:rgba(0,0,0,.07);
+    --line-b:rgba(0,0,0,.13);
     --radius:20px;
     --maxw:720px;
     font-synthesis:none;
@@ -37,16 +40,12 @@
     color:var(--text);background:var(--bg);line-height:1.5;
     -webkit-font-smoothing:antialiased;overflow-x:hidden;letter-spacing:-0.01em;
   }
-  .aura{position:fixed;inset:0;z-index:-2;overflow:hidden;
-    background:radial-gradient(110% 70% at 20% -10%,rgba(108,140,255,.18) 0%,transparent 55%),
-               radial-gradient(90% 60% at 80% 100%,rgba(167,139,250,.14) 0%,transparent 50%),
-               radial-gradient(80% 50% at 50% 50%,rgba(255,122,144,.07) 0%,transparent 60%),
-               var(--bg);}
-  .aura::before,.aura::after{content:"";position:absolute;border-radius:50%;filter:blur(80px);opacity:.4;mix-blend-mode:screen}
-  .aura::before{width:50vmax;height:50vmax;left:-15vmax;top:-10vmax;background:radial-gradient(circle,#6C8CFF,transparent 65%);animation:drift1 24s ease-in-out infinite}
-  .aura::after{width:44vmax;height:44vmax;right:-14vmax;bottom:-10vmax;background:radial-gradient(circle,#A78BFA,transparent 65%);animation:drift2 28s ease-in-out infinite}
-  @keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(8vmax,6vmax) scale(1.1)}}
-  @keyframes drift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-7vmax,-5vmax) scale(1.08)}}
+  .aura{position:fixed;inset:0;z-index:-2;overflow:hidden;background:#FDFBF7}
+  .aura::before,.aura::after{content:"";position:absolute;border-radius:50%;filter:blur(100px)}
+  .aura::before{width:62vmax;height:62vmax;right:-20vmax;top:-22vmax;background:radial-gradient(circle,rgba(255,149,128,.28),transparent 65%);animation:drift1 26s ease-in-out infinite}
+  .aura::after{width:56vmax;height:56vmax;left:-18vmax;bottom:-16vmax;background:radial-gradient(circle,rgba(142,124,195,.20),transparent 65%);animation:drift2 30s ease-in-out infinite}
+  @keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-7vmax,9vmax) scale(1.07)}}
+  @keyframes drift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(8vmax,-7vmax) scale(1.05)}}
   @media(prefers-reduced-motion:reduce){.aura::before,.aura::after{animation:none}*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
 
   .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px;width:100%}
@@ -56,16 +55,16 @@
 
   /* glass */
   .glass{
-    background:var(--glass);border:1px solid var(--line);border-radius:var(--radius);
-    backdrop-filter:blur(20px) saturate(150%);-webkit-backdrop-filter:blur(20px) saturate(150%);
-    box-shadow:0 20px 50px -24px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.07);
+    background:rgba(255,255,255,.76);border:1px solid rgba(255,255,255,.92);border-radius:var(--radius);
+    backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);
+    box-shadow:0 4px 32px -8px rgba(0,0,0,.09),inset 0 1px 0 rgba(255,255,255,.96);
   }
 
   /* brand */
   .brand{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:28px}
   .brand .mark{width:36px;height:36px;flex:none}
   .brand .name{font-size:20px;font-weight:800;letter-spacing:-.03em}
-  .brand .name b{color:#fff}
+  .brand .name b{color:var(--text)}
   .brand .name span{background:linear-gradient(96deg,var(--blue),var(--lavender));-webkit-background-clip:text;background-clip:text;color:transparent}
 
   /* hero */
@@ -77,10 +76,10 @@
 
   /* panel */
   .panel{padding:22px}
-  .tabs{display:flex;gap:6px;background:rgba(0,0,0,.30);padding:5px;border-radius:14px;margin-bottom:16px}
+  .tabs{display:flex;gap:6px;background:rgba(0,0,0,.05);padding:5px;border-radius:14px;margin-bottom:16px}
   .tab{flex:1;border:0;background:transparent;color:var(--text-dim);font:inherit;font-weight:700;font-size:14px;padding:10px;border-radius:10px;cursor:pointer;transition:.2s}
-  .tab[aria-selected="true"]{background:var(--glass-b);color:#fff;box-shadow:0 2px 10px -4px rgba(0,0,0,.5)}
-  textarea{width:100%;min-height:160px;resize:vertical;background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:14px;color:var(--text);font:inherit;font-size:14px;padding:14px;line-height:1.6}
+  .tab[aria-selected="true"]{background:rgba(255,255,255,.96);color:var(--text);box-shadow:0 2px 10px -4px rgba(0,0,0,.12)}
+  textarea{width:100%;min-height:160px;resize:vertical;background:rgba(0,0,0,.03);border:1px solid var(--line);border-radius:14px;color:var(--text);font:inherit;font-size:14px;padding:14px;line-height:1.6}
   textarea::placeholder{color:var(--text-faint)}
   textarea:focus,.tab:focus-visible,button:focus-visible,.drop:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 
@@ -89,10 +88,10 @@
   .panel[data-mode="paste"] .hint-paste{display:block}
   .panel[data-mode="file"] .hint-file{display:block}
 
-  .drop{border:1.5px dashed var(--line-b);border-radius:14px;padding:28px 16px;text-align:center;color:var(--text-dim);cursor:pointer;transition:.2s;background:rgba(0,0,0,.15)}
-  .drop:hover,.drop.over{border-color:var(--blue);background:rgba(108,140,255,.07);color:var(--text)}
-  .drop b{display:block;color:#fff;font-size:15px;margin-bottom:5px}
-  .drop small{font-size:12.5px;color:var(--text-faint)}
+  .drop{display:block;border:1.5px dashed var(--line-b);border-radius:14px;padding:32px 20px;text-align:center;color:var(--text-dim);cursor:pointer;transition:.2s;background:rgba(0,0,0,.02)}
+  .drop:hover,.drop.over{border-color:var(--blue);background:rgba(142,124,195,.06);color:var(--text)}
+  .drop b{display:block;color:var(--text);font-size:15px;margin-bottom:8px}
+  .drop small{display:block;font-size:12.5px;color:var(--text-faint);line-height:1.55}
   #fname{display:none;margin-top:10px;color:var(--green);font-size:13px;font-weight:700}
   #fname.show{display:block}
 
@@ -101,27 +100,27 @@
   .privacy svg{flex:none}
 
   /* error */
-  .err{display:none;margin-top:12px;padding:12px 14px;border-radius:12px;background:rgba(248,113,113,.10);border:1px solid rgba(248,113,113,.30);color:#FCA5A5;font-size:13.5px;line-height:1.5}
+  .err{display:none;margin-top:12px;padding:12px 14px;border-radius:12px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.18);color:#DC2626;font-size:13.5px;line-height:1.5}
   .err.show{display:block}
 
   /* cta buttons */
   .cta{display:block;width:100%;margin-top:16px;border:0;border-radius:14px;padding:16px;font:inherit;font-weight:800;font-size:16px;color:#fff;cursor:pointer;
-    background:linear-gradient(96deg,var(--blue),var(--lavender));
-    box-shadow:0 10px 28px -10px rgba(108,140,255,.55);transition:.2s}
-  .cta:hover{filter:brightness(1.08);transform:translateY(-1px)}
-  .cta:disabled{opacity:.4;cursor:not-allowed;transform:none;filter:none}
-  .ghost{background:transparent;border:1px solid var(--line);color:var(--text-dim);font:inherit;font-weight:700;font-size:14px;padding:12px 16px;border-radius:12px;cursor:pointer;transition:.2s}
-  .ghost:hover{color:#fff;border-color:var(--blue)}
+    background:linear-gradient(120deg,var(--blue),var(--lavender));
+    box-shadow:0 10px 28px -10px rgba(142,124,195,.40);transition:.2s}
+  .cta:hover{filter:brightness(1.06);transform:translateY(-1px)}
+  .cta:disabled{opacity:.35;cursor:not-allowed;transform:none;filter:none}
+  .ghost{background:rgba(255,255,255,.82);border:1px solid var(--line-b);color:var(--text-dim);font:inherit;font-weight:700;font-size:14px;padding:12px 16px;border-radius:12px;cursor:pointer;transition:.2s;backdrop-filter:blur(8px)}
+  .ghost:hover{color:var(--text);border-color:var(--blue);background:rgba(255,255,255,.96)}
 
   /* ---- purpose screen ---- */
   #purpose-screen .purpose-q{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;line-height:1.3}
   #purpose-screen .purpose-sub{color:var(--text-dim);font-size:14px;margin-bottom:24px}
   .purpose-list{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
-  .pc{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:16px;background:var(--glass);border:1.5px solid var(--line);cursor:pointer;transition:.2s;text-align:left;width:100%;font:inherit;color:var(--text)}
-  .pc:hover{border-color:var(--blue);background:rgba(108,140,255,.08)}
-  .pc[aria-selected="true"]{border-color:var(--blue);background:rgba(108,140,255,.12);box-shadow:0 0 0 3px rgba(108,140,255,.18)}
-  .pc .pi{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none;font-size:20px;background:rgba(108,140,255,.15)}
-  .pc[aria-selected="true"] .pi{background:rgba(108,140,255,.28)}
+  .pc{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:16px;background:rgba(255,255,255,.75);border:1.5px solid rgba(255,255,255,.92);cursor:pointer;transition:.2s;text-align:left;width:100%;font:inherit;color:var(--text);box-shadow:0 2px 12px -4px rgba(0,0,0,.07)}
+  .pc:hover{border-color:var(--blue);background:rgba(142,124,195,.08)}
+  .pc[aria-selected="true"]{border-color:var(--blue);background:rgba(142,124,195,.11);box-shadow:0 0 0 3px rgba(142,124,195,.16)}
+  .pc .pi{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none;font-size:20px;background:rgba(142,124,195,.12)}
+  .pc[aria-selected="true"] .pi{background:rgba(142,124,195,.24)}
   .pc .pt{font-weight:700;font-size:15px;margin-bottom:2px}
   .pc .pd{font-size:12.5px;color:var(--text-dim);line-height:1.45}
   .back{background:none;border:0;color:var(--text-faint);font:inherit;font-size:13.5px;cursor:pointer;display:flex;align-items:center;gap:5px;padding:0;margin-bottom:20px}
@@ -134,21 +133,21 @@
   .load-icon{width:88px;height:88px;margin:0 auto 24px}
   .load-title{font-size:18px;font-weight:800;margin-bottom:6px;letter-spacing:-.02em}
   .load-step{color:var(--text-dim);font-size:14px;height:1.4em;transition:.25s;min-height:1.4em}
-  .bar{width:min(260px,68vw);height:6px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:20px}
+  .bar{width:min(260px,68vw);height:6px;border-radius:99px;background:rgba(0,0,0,.07);overflow:hidden;margin-top:20px}
   .bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--blue),var(--lavender));transition:width .4s ease}
 
   /* ---- report ---- */
   .rep-head{text-align:center;margin-bottom:10px}
   .eyebrow{font-size:11.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);margin-bottom:10px}
-  .badge{display:inline-block;font-size:clamp(19px,5vw,26px);font-weight:850;letter-spacing:-.02em;line-height:1.3;
-    background:linear-gradient(96deg,#fff,#D4CCFF);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:10px}
+  .badge{display:inline-block;font-size:clamp(19px,5vw,26px);font-weight:800;letter-spacing:-.02em;line-height:1.3;
+    font-family:'Playfair Display',Georgia,serif;color:var(--text);margin-bottom:10px}
   .relnote{max-width:28em;margin:0 auto 12px;color:var(--text-dim);font-size:14px;line-height:1.65}
   .subnames{color:var(--text-dim);font-size:13.5px;margin-bottom:20px}
   .subnames b{color:var(--text)}
-  .purpose-tag{display:inline-block;padding:5px 12px;border-radius:99px;background:rgba(108,140,255,.15);border:1px solid rgba(108,140,255,.3);color:var(--blue);font-size:12px;font-weight:700;margin-bottom:16px}
-  .modeswitch{display:inline-flex;gap:5px;background:rgba(0,0,0,.25);padding:5px;border-radius:13px;margin-bottom:20px}
+  .purpose-tag{display:inline-block;padding:5px 12px;border-radius:99px;background:rgba(142,124,195,.10);border:1px solid rgba(142,124,195,.22);color:var(--blue);font-size:12px;font-weight:700;margin-bottom:16px}
+  .modeswitch{display:inline-flex;gap:5px;background:rgba(0,0,0,.05);padding:5px;border-radius:13px;margin-bottom:20px}
   .mode{border:0;background:transparent;color:var(--text-dim);font:inherit;font-weight:700;font-size:13px;padding:8px 14px;border-radius:9px;cursor:pointer;transition:.18s}
-  .mode[aria-selected="true"]{background:var(--glass-b);color:#fff;box-shadow:0 2px 8px -3px rgba(0,0,0,.5)}
+  .mode[aria-selected="true"]{background:rgba(255,255,255,.96);color:var(--text);box-shadow:0 2px 8px -3px rgba(0,0,0,.10)}
   .mode:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 
   .grid{display:grid;gap:16px}
@@ -162,15 +161,16 @@
   .gauge{position:absolute;inset:0;border-radius:50%;
     background:conic-gradient(from 180deg, var(--blue) 0%, var(--lavender) 35%, var(--coral) 70%, var(--warm) 100%);
     -webkit-mask:radial-gradient(closest-side, transparent 65%, #000 66%);mask:radial-gradient(closest-side, transparent 65%, #000 66%)}
-  .gauge-inner{position:absolute;inset:6px;border-radius:50%;box-shadow:inset 0 0 24px rgba(108,140,255,.25)}
+  .gauge-inner{position:absolute;inset:6px;border-radius:50%;background:rgba(255,255,255,.88);box-shadow:inset 0 0 16px rgba(142,124,195,.12)}
   .val{position:absolute;text-align:center}
-  .val b{font-size:44px;font-weight:850;display:block;line-height:1;letter-spacing:-.02em}
+  .val b{font-size:42px;font-weight:700;display:block;line-height:1;letter-spacing:-.02em;
+    font-family:'Playfair Display',Georgia,serif;color:var(--text)}
   .val small{font-size:11.5px;color:var(--text-dim)}
   .temp-desc{flex:1;min-width:0}
   .temp-desc .big{font-size:18px;font-weight:850;margin-bottom:5px;letter-spacing:-.02em}
   .temp-desc p{font-size:13px;color:var(--text-dim);line-height:1.6}
   .signals{margin-top:16px}
-  .sigbar{height:8px;border-radius:99px;overflow:hidden;display:flex;background:rgba(255,255,255,.07)}
+  .sigbar{height:8px;border-radius:99px;overflow:hidden;display:flex;background:rgba(0,0,0,.06)}
   .sigbar .sp{background:linear-gradient(90deg,var(--green),#2DD4BF)}
   .sigbar .sn{background:linear-gradient(90deg,var(--yellow),var(--red))}
   .sigrow{display:flex;justify-content:space-between;margin-top:6px;font-size:12px;font-weight:800}
@@ -179,12 +179,12 @@
   .sigex b{color:var(--text);font-weight:700;margin-right:5px}
 
   /* purpose-weighted insight */
-  .pw-insight{margin-top:14px;padding:14px 16px;border-radius:14px;background:linear-gradient(100deg,rgba(108,140,255,.13),rgba(167,139,250,.09));border:1px solid rgba(108,140,255,.20);font-size:13.5px;line-height:1.65;color:var(--text)}
+  .pw-insight{margin-top:14px;padding:14px 16px;border-radius:14px;background:linear-gradient(100deg,rgba(142,124,195,.09),rgba(180,168,220,.06));border:1px solid rgba(142,124,195,.16);font-size:13.5px;line-height:1.65;color:var(--text)}
   .pw-insight .pw-label{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:7px}
 
   /* personality */
   .ptype{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .pcard{padding:16px 14px;border-radius:16px;background:var(--glass);border:1px solid var(--line)}
+  .pcard{padding:16px 14px;border-radius:16px;background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.92)}
   .pcard .picon{width:28px;height:28px;margin-bottom:10px;color:var(--blue)}
   .pcard.b .picon{color:var(--coral)}
   .pcard .picon svg{width:100%;height:100%}
@@ -199,14 +199,14 @@
   .metric .mpct{font-weight:800;color:var(--text);font-size:13px}
   .vs{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
   .vs .who{font-size:11.5px;color:var(--text-faint);margin-bottom:4px}
-  .vs .num{font-size:24px;font-weight:850;letter-spacing:-.02em}
+  .vs .num{font-size:24px;font-weight:700;letter-spacing:-.02em;font-family:'Playfair Display',Georgia,serif}
   .vs .speed{font-size:12px;color:var(--text-dim);margin-top:3px}
   .vs .left{text-align:right}.vs .right{text-align:left}
   .vs .mid{font-size:11px;color:var(--text-faint);font-weight:800}
   .winA .left .num{color:var(--blue)}.winB .right .num{color:var(--coral)}
-  .ratio{height:11px;border-radius:99px;overflow:hidden;display:flex;background:rgba(255,255,255,.07);margin-top:4px}
-  .ratio .a{background:linear-gradient(90deg,var(--blue),#8BAEFF)}
-  .ratio .b{background:linear-gradient(90deg,var(--coral),#FFA5B8)}
+  .ratio{height:11px;border-radius:99px;overflow:hidden;display:flex;background:rgba(0,0,0,.06);margin-top:4px}
+  .ratio .a{background:linear-gradient(90deg,var(--blue),var(--lavender))}
+  .ratio .b{background:linear-gradient(90deg,var(--coral),#FCA5A5)}
 
   /* word cloud */
   .cloud{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 14px;padding:8px 4px;line-height:1.3}
@@ -214,8 +214,8 @@
 
   /* easter egg strip */
   .egg-strip{margin-top:12px;display:flex;flex-direction:column;gap:8px}
-  .egg{padding:11px 14px;border-radius:12px;background:rgba(167,139,250,.09);border:1px solid rgba(167,139,250,.18);font-size:13px;color:var(--text-dim);line-height:1.5}
-  .egg b{color:var(--lavender)}
+  .egg{padding:11px 14px;border-radius:12px;background:rgba(142,124,195,.07);border:1px solid rgba(142,124,195,.16);font-size:13px;color:var(--text-dim);line-height:1.5}
+  .egg b{color:var(--blue)}
 
   /* "남들이 보면" feature */
   .outsider{margin-top:14px}
@@ -223,15 +223,15 @@
   .out-bars{display:flex;flex-direction:column;gap:6px}
   .out-row{display:flex;align-items:center;gap:10px;font-size:12.5px}
   .out-row .out-label{width:80px;color:var(--text-dim);text-align:right;flex:none}
-  .out-row .out-bar{flex:1;height:8px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
+  .out-row .out-bar{flex:1;height:8px;border-radius:99px;background:rgba(0,0,0,.06);overflow:hidden}
   .out-row .out-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--lavender),var(--blue))}
   .out-row .out-pct{width:34px;text-align:left;color:var(--text);font-weight:700;font-size:12px}
 
   /* trend chart */
   .chartbox{width:100%;overflow:hidden}
   svg.trend{width:100%;height:auto;display:block}
-  .insight{margin-top:14px;padding:13px 15px;border-radius:13px;background:rgba(108,140,255,.10);border:1px solid rgba(108,140,255,.18);font-size:13.5px;line-height:1.65;color:var(--text)}
-  .insight b{color:#fff}
+  .insight{margin-top:14px;padding:13px 15px;border-radius:13px;background:rgba(142,124,195,.08);border:1px solid rgba(142,124,195,.16);font-size:13.5px;line-height:1.65;color:var(--text)}
+  .insight b{color:var(--blue)}
   .legend{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:10px;font-size:11.5px;color:var(--text-dim)}
   .legend span{display:inline-flex;align-items:center;gap:6px}
   .legend i{width:14px;height:3px;border-radius:2px;display:inline-block}
@@ -242,14 +242,14 @@
   .footnote{text-align:center;color:var(--text-faint);font-size:11.5px;margin-top:22px;line-height:1.6}
 
   /* share modal */
-  .modal{position:fixed;inset:0;z-index:50;display:none;place-items:center;padding:18px;background:rgba(4,6,20,.80);backdrop-filter:blur(8px)}
+  .modal{position:fixed;inset:0;z-index:50;display:none;place-items:center;padding:18px;background:rgba(250,248,244,.88);backdrop-filter:blur(14px)}
   .modal.show{display:grid;animation:fade .22s ease}
   .modal-inner{max-width:340px;width:100%;text-align:center}
-  .share-tabs{display:flex;gap:5px;background:rgba(0,0,0,.30);padding:4px;border-radius:12px;margin-bottom:14px}
+  .share-tabs{display:flex;gap:5px;background:rgba(0,0,0,.06);padding:4px;border-radius:12px;margin-bottom:14px}
   .share-tab{flex:1;border:0;background:transparent;color:var(--text-dim);font:inherit;font-weight:700;font-size:13px;padding:8px;border-radius:9px;cursor:pointer;transition:.18s}
-  .share-tab[aria-selected="true"]{background:var(--glass-b);color:#fff}
-  #shareCanvas{width:100%;max-width:270px;border-radius:18px;box-shadow:0 28px 60px -18px rgba(0,0,0,.9);margin:0 auto 14px;display:block}
-  #shareCanvasKakao{width:100%;max-width:310px;border-radius:18px;box-shadow:0 28px 60px -18px rgba(0,0,0,.9);margin:0 auto 14px;display:none}
+  .share-tab[aria-selected="true"]{background:rgba(255,255,255,.96);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.09)}
+  #shareCanvas{width:100%;max-width:270px;border-radius:18px;box-shadow:0 16px 48px -12px rgba(0,0,0,.22);margin:0 auto 14px;display:block}
+  #shareCanvasKakao{width:100%;max-width:310px;border-radius:18px;box-shadow:0 16px 48px -12px rgba(0,0,0,.22);margin:0 auto 14px;display:none}
   .modal .row{display:flex;gap:10px}.modal .row .cta,.modal .row .ghost{flex:1;margin-top:0}
 
   @media(min-width:560px){.temp-wrap{gap:26px}}
@@ -263,16 +263,16 @@
   .ph-hot{color:var(--coral)} .ph-warm{color:var(--yellow)} .ph-cool{color:var(--blue)}
   .period-mid{text-align:center;color:var(--text-faint);font-size:20px;flex:none}
   .delta-pill{display:inline-block;font-size:12.5px;font-weight:800;padding:4px 12px;border-radius:99px}
-  .d-up{background:rgba(255,122,144,.15);color:var(--coral)} .d-down{background:rgba(108,140,255,.15);color:var(--blue)} .d-flat{background:rgba(255,255,255,.07);color:var(--text-dim)}
+  .d-up{background:rgba(248,113,113,.10);color:var(--coral)} .d-down{background:rgba(142,124,195,.10);color:var(--blue)} .d-flat{background:rgba(0,0,0,.05);color:var(--text-dim)}
   .flirt-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
   .fl-name{width:70px;font-size:12.5px;color:var(--text-dim);text-align:right;flex:none}
-  .flirt-bar{flex:1;height:10px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
+  .flirt-bar{flex:1;height:10px;border-radius:99px;background:rgba(0,0,0,.06);overflow:hidden}
   .flirt-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--lavender),var(--coral))}
   .fl-pct{width:36px;font-weight:800;font-size:12.5px;color:var(--coral)}
 
   /* ── 스코어 그리드 (안정감 등) ── */
   .score-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
-  .sc-item{padding:14px 12px;border-radius:14px;background:var(--glass);border:1px solid var(--line);text-align:center}
+  .sc-item{padding:14px 12px;border-radius:14px;background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.92);text-align:center}
   .sc-val{font-size:28px;font-weight:850;letter-spacing:-.02em;margin-bottom:3px}
   .sc-h{color:var(--green)} .sc-m{color:var(--yellow)} .sc-l{color:var(--red)} .sc-na{color:var(--text-faint);font-size:16px;line-height:2.5}
   .sc-who{font-size:12px;font-weight:700;color:var(--text-dim);margin-bottom:2px}
@@ -294,13 +294,13 @@
   .genre-list{display:flex;flex-direction:column;gap:7px;margin-top:6px}
   .genre-row{display:flex;align-items:center;gap:10px}
   .ge-label{width:138px;font-size:12.5px;color:var(--text-dim);flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .ge-bar{flex:1;height:8px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
+  .ge-bar{flex:1;height:8px;border-radius:99px;background:rgba(0,0,0,.06);overflow:hidden}
   .ge-fill{height:100%;border-radius:99px}
   .ge-pct{width:34px;text-align:right;font-weight:800;font-size:12px;color:var(--text)}
 
   /* ── 다음 답장 추천 ── */
   .reply-list{display:flex;flex-direction:column;gap:8px;margin-top:6px}
-  .reply-item{padding:12px 14px;border-radius:14px;background:var(--glass);border:1px solid var(--line)}
+  .reply-item{padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.92)}
   .ri-mode{font-size:10.5px;font-weight:800;letter-spacing:.07em;color:var(--lavender);margin-bottom:4px;text-transform:uppercase}
   .ri-text{font-size:14px;color:var(--text);line-height:1.55}
 </style>
@@ -314,26 +314,39 @@
     <div class="brand">
       <svg class="mark" viewBox="0 0 48 48" fill="none" aria-hidden="true">
         <defs><linearGradient id="lg0" x1="0" y1="0" x2="48" y2="48">
-          <stop offset="0" stop-color="#6C8CFF"/><stop offset="1" stop-color="#A78BFA"/>
+          <stop offset="0" stop-color="#8E7CC3"/><stop offset="1" stop-color="#B4A8DC"/>
         </linearGradient></defs>
-        <path d="M9 11h17a5 5 0 0 1 5 5v9a5 5 0 0 1-5 5h-6l-6 5v-5a5 5 0 0 1-5-5v-9a5 5 0 0 1 5-5Z" fill="url(#lg0)" opacity=".28"/>
-        <path d="M39 17H22a5 5 0 0 0-5 5v9a5 5 0 0 0 5 5h6l6 5v-5a5 5 0 0 0 5-5v-9a5 5 0 0 0-5-5Z" fill="url(#lg0)" opacity=".28"/>
-        <path d="M24 13l9 11-9 11-9-11 9-11Z" fill="url(#lg0)"/>
+        <path d="M14 38 L14 22 Q14 10 24 10 Q34 10 34 22 L34 38 Z" fill="url(#lg0)" opacity=".18" stroke="url(#lg0)" stroke-width="1.8"/>
+        <path d="M20 34 L20 23 Q20 16 24 16 Q28 16 28 23 L28 34" stroke="url(#lg0)" stroke-width="1.2" fill="none" opacity=".5"/>
+        <path d="M10 40 L38 40" stroke="#8E7CC3" stroke-width="2" stroke-linecap="round" opacity=".35"/>
+        <path d="M15 44 L33 44" stroke="#8E7CC3" stroke-width="2" stroke-linecap="round" opacity=".16"/>
       </svg>
       <div class="name"><b>톡</b><span>미러</span></div>
     </div>
 
     <div class="hero">
       <svg class="hero-icon" viewBox="0 0 100 100" fill="none" aria-hidden="true">
-        <defs><linearGradient id="hg" x1="0" y1="0" x2="100" y2="100">
-          <stop offset="0" stop-color="#6C8CFF"/><stop offset=".5" stop-color="#A78BFA"/><stop offset="1" stop-color="#FF7A90"/>
-        </linearGradient></defs>
-        <path d="M50 14 84 74H16L50 14Z" stroke="url(#hg)" stroke-width="2.5" fill="rgba(108,140,255,.08)"/>
-        <path d="M6 50h28" stroke="#fff" stroke-width="2" opacity=".4"/>
-        <path d="M58 46h36" stroke="#6C8CFF" stroke-width="2"/>
-        <path d="M58 52h36" stroke="#A78BFA" stroke-width="2"/>
-        <path d="M58 58h36" stroke="#FF7A90" stroke-width="2"/>
-        <circle cx="50" cy="50" r="3.5" fill="#fff"/>
+        <defs>
+          <linearGradient id="hg" x1="0" y1="0" x2="100" y2="100">
+            <stop offset="0" stop-color="#8E7CC3"/><stop offset="1" stop-color="#B4A8DC"/>
+          </linearGradient>
+          <linearGradient id="hg2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#F87171" stop-opacity=".5"/><stop offset="1" stop-color="#FB923C" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <!-- Mirror arch shape -->
+        <path d="M 26 84 L 26 44 Q 26 16 50 16 Q 74 16 74 44 L 74 84 Z" stroke="url(#hg)" stroke-width="2.5" fill="rgba(142,124,195,.07)"/>
+        <!-- Inner arch reflection -->
+        <path d="M 37 78 L 37 46 Q 37 28 50 28 Q 63 28 63 46 L 63 78" stroke="rgba(142,124,195,.30)" stroke-width="1.5" fill="none"/>
+        <!-- Peach glow accent top -->
+        <ellipse cx="50" cy="28" rx="12" ry="6" fill="url(#hg2)"/>
+        <!-- Base stand -->
+        <path d="M 20 86 L 80 86" stroke="#2C2C2C" stroke-width="2.5" stroke-linecap="round" opacity=".18"/>
+        <path d="M 30 91 L 70 91" stroke="#2C2C2C" stroke-width="2.5" stroke-linecap="round" opacity=".08"/>
+        <!-- Sparkle dots -->
+        <circle cx="40" cy="35" r="2.2" fill="rgba(248,113,113,.55)"/>
+        <circle cx="34" cy="44" r="1.4" fill="rgba(142,124,195,.45)"/>
+        <circle cx="64" cy="38" r="1.6" fill="rgba(180,168,220,.6)"/>
       </svg>
       <h1>대화가 비추는<br><span class="grad">우리의 진짜 온도.</span></h1>
       <p>카카오톡 대화를 붙여넣거나 .txt 파일로 올리면<br>관계 유형·감정 온도·소통 성향을 3초 만에 비춰드려요.</p>
@@ -370,7 +383,7 @@
     </div>
 
     <div class="privacy">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2 4 6v6c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10V6l-8-4Z" stroke="#6C8CFF" stroke-width="1.6"/><path d="m9 12 2 2 4-4" stroke="#6C8CFF" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2 4 6v6c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10V6l-8-4Z" stroke="#8E7CC3" stroke-width="1.6"/><path d="m9 12 2 2 4-4" stroke="#8E7CC3" stroke-width="1.6" stroke-linecap="round"/></svg>
       모든 분석은 브라우저 안에서만 일어나요. 대화는 어디에도 전송되지 않습니다.
     </div>
   </div>
@@ -421,16 +434,18 @@
   <div>
     <svg class="load-icon" viewBox="0 0 88 88" fill="none" aria-hidden="true">
       <defs><linearGradient id="lg2" x1="0" y1="0" x2="88" y2="88">
-        <stop offset="0" stop-color="#6C8CFF"/><stop offset="1" stop-color="#A78BFA"/>
+        <stop offset="0" stop-color="#8E7CC3"/><stop offset="1" stop-color="#B4A8DC"/>
       </linearGradient></defs>
-      <path d="M44 12l30 55H14L44 12Z" stroke="url(#lg2)" stroke-width="2.5" fill="none">
-        <animate attributeName="opacity" values="0.4;1;0.4" dur="1.8s" repeatCount="indefinite"/>
+      <!-- Mirror arch -->
+      <path d="M 20 76 L 20 40 Q 20 12 44 12 Q 68 12 68 40 L 68 76 Z" stroke="url(#lg2)" stroke-width="2.2" fill="rgba(142,124,195,.07)">
+        <animate attributeName="opacity" values="0.5;1;0.5" dur="1.8s" repeatCount="indefinite"/>
       </path>
+      <path d="M 32 70 L 32 42 Q 32 24 44 24 Q 56 24 56 42 L 56 70" stroke="rgba(142,124,195,.35)" stroke-width="1.4" fill="none"/>
+      <path d="M 14 78 L 74 78" stroke="#8E7CC3" stroke-width="2" stroke-linecap="round" opacity=".3"/>
+      <!-- Scanning line animation -->
       <g>
-        <path d="M52 41h26" stroke="#6C8CFF" stroke-width="2.5"/>
-        <path d="M52 47h22" stroke="#A78BFA" stroke-width="2.5"/>
-        <path d="M52 53h18" stroke="#FF7A90" stroke-width="2.5"/>
-        <animateTransform attributeName="transform" type="translate" values="0 0;5 0;0 0" dur="1.6s" repeatCount="indefinite"/>
+        <line x1="20" y1="44" x2="68" y2="44" stroke="#F87171" stroke-width="1.8" stroke-linecap="round" opacity=".7"/>
+        <animateTransform attributeName="transform" type="translate" values="0 0;0 14;0 0" dur="1.6s" repeatCount="indefinite"/>
       </g>
     </svg>
     <div class="load-title">대화를 거울에 비추는 중…</div>
@@ -703,33 +718,43 @@ function relationshipType(R){
 
   if(businessy)
     return {badge:"🤝 신뢰가 쌓인 비즈니스 파트너",emoji:"🤝",
-      note:"감정 표현은 절제돼 있지만, 핵심을 정확히 주고받는 프로페셔널한 사이예요."};
+      note:"감정 표현은 절제돼 있지만, 핵심을 정확히 주고받는 프로페셔널한 사이예요.",
+      noteFun:"감정 없음, 핵심만 ㅋ 이게 진짜 프로 냄새 나는 사이임."};
   if(romantic&&temp>=75&&balance>0.65)
     return {badge:"💞 안정기에 접어든 연인",emoji:"💞",
-      note:"따뜻한 호칭과 높은 감정 온도가 오래 함께한 편안함을 보여줘요."};
+      note:"따뜻한 호칭과 높은 감정 온도가 오래 함께한 편안함을 보여줘요.",
+      noteFun:"야 이미 다 됐네요 ㅋ 뜨겁고 편안함 사이 어딘가의 최강 조합."};
   if(romantic&&temp>=68&&lean)
     return {badge:"💗 한 사람이 조금 더 마음을 내는 중",emoji:"💗",
-      note:`${trim(leader)}님 쪽 발화와 선톡이 조금 더 많아요. 기운 시소지만, 마음의 방향은 직접 확인하는 게 제일 정확해요.`};
+      note:`${trim(leader)}님 쪽 발화와 선톡이 조금 더 많아요. 기운 시소지만, 마음의 방향은 직접 확인하는 게 제일 정확해요.`,
+      noteFun:`${trim(leader)}님이 조금 더 달리고 있어요 ㅋ 마음의 방향은 직접 확인해봐야 함.`};
   if(romantic&&temp>=65)
     return {badge:"🔥 불꽃 튀는 썸의 한가운데",emoji:"🔥",
-      note:"설렘 키워드와 빠른 핑퐁이 오가는, 가장 짜릿한 구간이에요."};
+      note:"설렘 키워드와 빠른 핑퐁이 오가는, 가장 짜릿한 구간이에요.",
+      noteFun:"이거 완전 썸 타는 거 맞잖아요 ㅋㅋ 빠른 핑퐁에 설렘 키워드까지 다 있음."};
   if(romantic&&temp>=55&&balance<0.6)
     return {badge:"🚣 한쪽이 노 젓는 카누형 관계",emoji:"🚣",
-      note:"대화를 이어가는 노력이 한쪽에 쏠려 있어요. 상대의 반응을 조금 더 지켜봐도 좋겠어요."};
+      note:"대화를 이어가는 노력이 한쪽에 쏠려 있어요. 상대의 반응을 조금 더 지켜봐도 좋겠어요.",
+      noteFun:"한 사람이 노 젓는 중 ㅋ 근데 그 사람이 나일 수도 있으니까 잠깐 멈춰봐요."};
   if(romantic&&temp>=52)
     return {badge:"🌫️ 서로 눈치만 보는 안개 낀 썸",emoji:"🌫️",
-      note:"대화는 끊기지 않지만 방향이 애매해요. 가벼운 만남 제안으로 관계를 확인해볼 때예요."};
+      note:"대화는 끊기지 않지만 방향이 애매해요. 가벼운 만남 제안으로 관계를 확인해볼 때예요.",
+      noteFun:"진짜 좀 답답한 안개형... ㅋ 한 번 들이밀어보는 건 어때요?"};
   if(romantic&&temp<52)
     return {badge:"❄️ 천천히 달궈지는 저온 썸",emoji:"❄️",
-      note:"온도는 낮지만 꺼지지는 않은 상태예요. 일상 공유로 온도를 서서히 올려보세요."};
+      note:"온도는 낮지만 꺼지지는 않은 상태예요. 일상 공유로 온도를 서서히 올려보세요.",
+      noteFun:"아직 시작도 안 한 거 같은데요 ㅋ 천천히 일상 공유로 서서히 달궈봐요."};
   if(laughter>0.12&&balance>0.58&&temp>=66)
     return {badge:"😆 텐션 잘 맞는 편한 단짝",emoji:"😆",
-      note:"ㅋㅋ가 끊이지 않고 주고받는 양도 비슷해요. 케미가 좋은 친구 사이!"};
+      note:"ㅋㅋ가 끊이지 않고 주고받는 양도 비슷해요. 케미가 좋은 친구 사이!",
+      noteFun:"ㅋㅋ 케미 실화임? 발화량도 비슷하고 찰떡 친구 인증각이에요."};
   if(temp<52)
     return {badge:"🌧️ 살짝 거리감이 생긴 구간",emoji:"🌧️",
-      note:"긍정 신호가 다소 줄어든 시기예요. 가벼운 안부 한 마디가 온도를 올릴 수 있어요."};
+      note:"긍정 신호가 다소 줄어든 시기예요. 가벼운 안부 한 마디가 온도를 올릴 수 있어요.",
+      noteFun:"요즘 좀 시들해졌나봐요... 먼저 연락 한 번 어때요? ㅋ"};
   return {badge:"🌤️ 잔잔하게 흐르는 사이",emoji:"🌤️",
-    note:"큰 기복 없이 편안하게 이어지는 관계예요."};
+    note:"큰 기복 없이 편안하게 이어지는 관계예요.",
+    noteFun:"딱히 드라마는 없지만 잘 지내는 사이 ㅋ 그것도 괜찮음."};
 }
 function trim(n){ return n.length>6?n.slice(0,6)+"…":n; }
 
@@ -992,7 +1017,7 @@ function topWords(conv){
   return Object.entries(cnt).filter(e=>e[1]>=2).sort((a,b)=>b[1]-a[1]).slice(0,12);
 }
 
-/* ── SVG 차트 ── */
+/* ── SVG 차트 (곡선) ── */
 function trendSVG(b){
   const W=320,H=160,padL=10,padR=10,padT=14,padB=28;
   const n=b.length,iw=W-padL-padR,ih=H-padT-padB;
@@ -1002,57 +1027,89 @@ function trendSVG(b){
   const bw=Math.max(8,iw/n*0.44);
   let bars="";
   b.forEach((d,i)=>{const h=d.count/maxC*ih;const tot=d.pos+d.neg;
-    const col=tot===0?"#4B5563":(d.pos>=d.neg?"#34D399":"#F87171");
-    bars+=`<rect x="${(x(i)-bw/2).toFixed(1)}" y="${(padT+ih-h).toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1,h).toFixed(1)}" rx="3" fill="${col}" opacity=".38"/>`;});
-  const pts=b.map((d,i)=>`${x(i).toFixed(1)},${yT(d.temp).toFixed(1)}`).join(" ");
-  const dots=b.map((d,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${yT(d.temp).toFixed(1)}" r="3.5" fill="#FBBF24" stroke="#111827" stroke-width="1.2"/>`).join("");
-  const labels=b.map((d,i)=>`<text x="${x(i).toFixed(1)}" y="${H-9}" font-size="11" fill="#6B7280" text-anchor="middle">${esc(d.label)}</text>`).join("");
+    const col=tot===0?"rgba(0,0,0,.06)":(d.pos>=d.neg?"rgba(16,185,129,.28)":"rgba(239,68,68,.22)");
+    bars+=`<rect x="${(x(i)-bw/2).toFixed(1)}" y="${(padT+ih-h).toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1,h).toFixed(1)}" rx="3" fill="${col}"/>`;});
+  // 곡선 경로 (cubic bezier smooth)
+  const pts=b.map((d,i)=>[x(i),yT(d.temp)]);
+  let smoothD=`M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+  for(let i=1;i<pts.length;i++){
+    const cpx=((pts[i-1][0]+pts[i][0])/2).toFixed(1);
+    smoothD+=` C ${cpx} ${pts[i-1][1].toFixed(1)} ${cpx} ${pts[i][1].toFixed(1)} ${pts[i][0].toFixed(1)} ${pts[i][1].toFixed(1)}`;
+  }
+  const fillD=smoothD+` L ${pts[pts.length-1][0].toFixed(1)} ${(padT+ih).toFixed(1)} L ${pts[0][0].toFixed(1)} ${(padT+ih).toFixed(1)} Z`;
+  const dots=pts.map((p,i)=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" fill="#8E7CC3" stroke="#FDFBF7" stroke-width="1.5"/>`).join("");
+  const labels=b.map((d,i)=>`<text x="${x(i).toFixed(1)}" y="${H-7}" font-size="10" fill="#A1A1AA" text-anchor="middle">${esc(d.label)}</text>`).join("");
   return `<svg class="trend" viewBox="0 0 ${W} ${H}" role="img" aria-label="감정 흐름 그래프">
-    ${bars}<polyline points="${pts}" fill="none" stroke="#FBBF24" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8E7CC3" stop-opacity=".16"/><stop offset="100%" stop-color="#8E7CC3" stop-opacity="0"/>
+    </linearGradient></defs>
+    ${bars}<path d="${fillD}" fill="url(#tg)"/>
+    <path d="${smoothD}" fill="none" stroke="#8E7CC3" stroke-width="2.5" stroke-linecap="round"/>
     ${dots}${labels}</svg>`;
 }
 
-/* ── 공유 카드 ── */
+/* ── 공유 카드 (에디토리얼 라이트) ── */
 function drawShareCard(){
   if(!LAST)return;
   const {R,rel,pa,pb}=LAST;
   const c=document.querySelector("#shareCanvas"),g=c.getContext("2d");
   const W=c.width,H=c.height;
-  const bg=g.createLinearGradient(0,0,W,H);
-  bg.addColorStop(0,"#111827"); bg.addColorStop(.5,"#1a1f35"); bg.addColorStop(1,"#1f1435");
-  g.fillStyle=bg; g.fillRect(0,0,W,H);
-  radial(g,W*0.2,H*0.15,280,"rgba(108,140,255,.40)");
-  radial(g,W*0.85,H*0.9,320,"rgba(167,139,250,.28)");
-  radial(g,W*0.5,H*0.5,200,"rgba(255,122,144,.10)");
+  // 따뜻한 오프화이트 배경
+  g.fillStyle="#FDFBF7"; g.fillRect(0,0,W,H);
+  // 유기적 블롭
+  radial(g,W*0.88,H*0.06,260,"rgba(255,149,128,.26)");
+  radial(g,W*0.10,H*0.88,240,"rgba(142,124,195,.18)");
+  radial(g,W*0.5,H*0.55,180,"rgba(180,168,220,.08)");
   g.textAlign="center";
-  g.fillStyle="rgba(249,250,251,.8)"; g.font="700 26px Pretendard, sans-serif";
-  g.fillText("톡미러 · TalkMirror", W/2, 68);
-  g.fillStyle="#9CA3AF"; g.font="500 18px Pretendard, sans-serif";
-  g.fillText("우리 대화가 비추는 관계는…", W/2, 148);
-  g.font="800 32px Pretendard, sans-serif";
-  wrapText(g,rel.badge,W/2,210,W-80,42,"#ffffff");
-  drawTempRing(g,W/2,470,120);
-  g.fillStyle="#fff"; g.font="800 74px Pretendard, sans-serif"; g.textAlign="center";
-  g.fillText(R.temp+"°",W/2,490);
-  g.fillStyle="#9CA3AF"; g.font="600 17px Pretendard, sans-serif";
-  g.fillText("감정 온도",W/2,528);
+  // 브랜드
+  g.fillStyle="rgba(44,44,44,.45)"; g.font="600 20px Pretendard, sans-serif";
+  g.fillText("🪞 TALK MIRROR", W/2, 62);
+  // 구분선
+  g.strokeStyle="rgba(0,0,0,.09)"; g.lineWidth=1;
+  g.beginPath(); g.moveTo(60,82); g.lineTo(W-60,82); g.stroke();
+  // eyebrow
+  g.fillStyle="#8E7CC3"; g.font="700 11px Pretendard, sans-serif";
+  g.fillText("우리 대화가 비추는 관계", W/2, 124);
+  // 관계 뱃지 (Playfair)
+  g.font="bold 34px 'Playfair Display', Georgia, serif";
+  wrapText(g,rel.badge,W/2,186,W-72,48,"#2C2C2C");
+  // 온도 링
+  drawTempRing(g,W/2,430,118);
+  // 온도 숫자 (Playfair)
+  g.fillStyle="rgba(255,255,255,.90)";
+  g.beginPath(); g.arc(W/2,430,90,0,7); g.fill();
+  g.font="bold 80px 'Playfair Display', Georgia, serif";
+  g.fillStyle="#2C2C2C"; g.textAlign="center";
+  g.fillText(R.temp+"°",W/2,456);
+  g.font="500 15px Pretendard, sans-serif"; g.fillStyle="#5C5C6E";
+  g.fillText("감정 온도",W/2,490);
+  // 관계 설명
+  g.font="400 14px Pretendard, sans-serif"; g.fillStyle="#5C5C6E";
+  wrapText(g,rel.note,W/2,550,W-100,22,"#5C5C6E");
+  // 스탯 박스
+  g.fillStyle="rgba(255,255,255,.82)"; roundRect(g,44,618,W-88,160,22); g.fill();
+  g.strokeStyle="rgba(255,255,255,.92)"; g.lineWidth=1; g.stroke();
   const A=R.A,B=R.B,la=R.P[A].medLat,lb=R.P[B].medLat;
-  g.fillStyle="rgba(255,255,255,.06)"; roundRect(g,40,638,W-80,148,24); g.fill();
-  g.fillStyle="#6C8CFF"; g.font="700 17px Pretendard, sans-serif"; g.textAlign="left";
-  g.fillText(MODE==="warm"?"답장 리듬 🎵":"답장 속도 대결 ⚔️",70,680);
-  g.fillStyle="#F9FAFB"; g.font="600 20px Pretendard, sans-serif";
-  g.fillText(`${cut(A,7)}  ${la!=null?speedLabel(la,MODE):"—"}`,70,718);
-  g.fillText(`${cut(B,7)}  ${lb!=null?speedLabel(lb,MODE):"—"}`,70,756);
-  g.textAlign="center"; g.fillStyle="#D4CCFF"; g.font="600 16px Pretendard, sans-serif";
-  wrapText(g,`${cut(A,6)}: ${pa.title}  ·  ${cut(B,6)}: ${pb.title}`,W/2,830,W-70,26,"#D4CCFF");
-  g.fillStyle="rgba(0,0,0,.32)"; roundRect(g,70,886,W-140,46,23); g.fill();
-  g.fillStyle="#fff"; g.font="700 16px Pretendard, sans-serif"; g.textAlign="center";
-  g.fillText("🔍 톡미러에서 우리 관계 분석해보기",W/2,914);
+  g.fillStyle="#8E7CC3"; g.font="700 13px Pretendard, sans-serif"; g.textAlign="left";
+  g.fillText(MODE==="warm"?"답장 리듬 🎵":"답장 속도 ⚡",74,658);
+  g.fillStyle="#2C2C2C"; g.font="500 17px Pretendard, sans-serif";
+  g.fillText(`${cut(A,7)}  ${la!=null?speedLabel(la,MODE):"—"}`,74,686);
+  g.fillText(`${cut(B,7)}  ${lb!=null?speedLabel(lb,MODE):"—"}`,74,712);
+  g.strokeStyle="rgba(0,0,0,.07)"; g.lineWidth=1;
+  g.beginPath(); g.moveTo(74,726); g.lineTo(W-74,726); g.stroke();
+  g.fillStyle="#5C5C6E"; g.font="500 13px Pretendard, sans-serif";
+  g.fillText(`${cut(A,5)}: ${pa.title}`,74,752); g.fillText(`${cut(B,5)}: ${pb.title}`,74,770);
+  // CTA 버튼
+  const ctaBg=g.createLinearGradient(70,878,W-70,878);
+  ctaBg.addColorStop(0,"#8E7CC3"); ctaBg.addColorStop(1,"#B4A8DC");
+  g.fillStyle=ctaBg; roundRect(g,70,858,W-140,46,23); g.fill();
+  g.fillStyle="#fff"; g.font="700 15px Pretendard, sans-serif"; g.textAlign="center";
+  g.fillText("🔍 톡미러에서 우리 관계 분석해보기",W/2,886);
 }
 function cut(s,n){return s.length>n?s.slice(0,n)+"…":s;}
 function radial(g,x,y,r,col){const rg=g.createRadialGradient(x,y,0,x,y,r);rg.addColorStop(0,col);rg.addColorStop(1,"rgba(0,0,0,0)");g.fillStyle=rg;g.beginPath();g.arc(x,y,r,0,7);g.fill();}
 function roundRect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
-function drawTempRing(g,cx,cy,r){const cols=["#6C8CFF","#A78BFA","#FF7A90","#FF8A5B"];for(let i=0;i<240;i++){const a=-Math.PI/2+i/240*Math.PI*2;const t=i/240;const ci=Math.min(3,Math.floor(t*4));g.strokeStyle=cols[ci];g.lineWidth=13;g.beginPath();g.arc(cx,cy,r,a,a+0.03);g.stroke();}}
+function drawTempRing(g,cx,cy,r){const cols=["#8E7CC3","#B4A8DC","#F87171","#FB923C"];for(let i=0;i<240;i++){const a=-Math.PI/2+i/240*Math.PI*2;const t=i/240;const ci=Math.min(3,Math.floor(t*4));g.strokeStyle=cols[ci];g.lineWidth=13;g.beginPath();g.arc(cx,cy,r,a,a+0.03);g.stroke();}}
 function wrapText(g,text,x,y,maxW,lh,color){g.fillStyle=color;const words=text.split(" ");let line="",yy=y;for(const w of words){const test=line?line+" "+w:w;if(g.measureText(test).width>maxW&&line){g.fillText(line,x,yy);line=w;yy+=lh;}else line=test;}g.fillText(line,x,yy);}
 
 /* ── 렌더 ── */
@@ -1079,13 +1136,15 @@ function render(R){
   LAST={R,rel,buckets,pa,pb,insight};
 
   $("#relBadge").textContent=rel.badge;
-  $("#relNote").textContent=rel.note;
+  $("#relNote").textContent=MODE==="fun"?(rel.noteFun||rel.note):rel.note;
   $("#subnames").innerHTML=`<b>${esc(R.A)}</b> ✕ <b>${esc(R.B)}</b>`+(R.isGroup?` <span style="color:var(--text-faint)">· 발화량 상위 2명 기준</span>`:"");
 
   const purposeNames={interest:"💘 관심 신호",cooling:"🌡️ 온도 변화",effort:"⚖️ 노력 균형",conflict:"🌀 갈등 패턴",style:"🪞 말투 분석"};
   $("#purposeTag").innerHTML=`<div class="purpose-tag">${purposeNames[PURPOSE]||""} 기준으로 분석했어요</div>`;
 
-  const tempDesc=R.temp>=80?"뜨겁게 끓는 중":R.temp>=65?"따뜻하게 데워진 사이":R.temp>=52?"미지근한 온기":"차분히 가라앉은 상태";
+  const tempDesc=MODE==="fun"
+    ?(R.temp>=80?"🔥 이거 완전 불나는 거 아님?":R.temp>=65?"☕ 나름 따뜻하네 ㅋ":R.temp>=52?"🤔 음... 미지근?":"🧊 이거 좀 식은 거 아님?")
+    :(R.temp>=80?"뜨겁게 끓는 중":R.temp>=65?"따뜻하게 데워진 사이":R.temp>=52?"미지근한 온기":"차분히 가라앉은 상태");
   const P=R.P,A=R.A,B=R.B;
   const initApct=Math.round(P[A].initiations/R.totalInit*100);
   const msgApct=Math.round(P[A].msgs/R.totalMsg*100);
@@ -1141,7 +1200,7 @@ function render(R){
 
     // 3. 핑퐁
     `<div class="glass card"><h3><span class="dot"></span>대화의 핑퐁</h3>
-      <div class="metric"><div class="mlabel"><span>평균 답장 속도 <small style="color:var(--text-faint)">(중앙값)</small></span></div>
+      <div class="metric"><div class="mlabel"><span>답장 텀 중앙값</span></div>
         <div class="vs ${latWin}">
           <div class="left"><div class="who">${esc(trim(A))}</div><div class="num">${fmtMin(la)}</div><div class="speed">${la!=null?speedLabel(la,MODE):"표본 부족"}</div></div>
           <div class="mid">vs</div>
@@ -1359,63 +1418,62 @@ document.querySelectorAll(".mode").forEach(btn=>btn.addEventListener("click",()=
   if(LAST)render(LAST.R);
 }));
 
-// 카카오 공유 카드 (1:1 정사각형, 800×800)
+// 카카오 공유 카드 (에디토리얼 라이트, 800×800)
 function drawKakaoCard(){
   if(!LAST)return;
   const {R,rel,pa,pb}=LAST;
   const c=document.querySelector("#shareCanvasKakao"),g=c.getContext("2d");
   const W=c.width,H=c.height;
-  // 배경
-  const bg=g.createLinearGradient(0,0,W,H);
-  bg.addColorStop(0,"#111827"); bg.addColorStop(1,"#1a1435");
-  g.fillStyle=bg; g.fillRect(0,0,W,H);
-  radial(g,W*0.15,H*0.15,300,"rgba(108,140,255,.45)");
-  radial(g,W*0.85,H*0.85,280,"rgba(167,139,250,.32)");
-  radial(g,W*0.5,H*0.5,220,"rgba(255,122,144,.10)");
+  // 오프화이트 배경
+  g.fillStyle="#FDFBF7"; g.fillRect(0,0,W,H);
+  radial(g,W*0.88,H*0.08,280,"rgba(255,149,128,.24)");
+  radial(g,W*0.10,H*0.90,260,"rgba(142,124,195,.16)");
   g.textAlign="center";
   // 브랜드
-  g.fillStyle="rgba(249,250,251,.75)"; g.font="600 22px Pretendard, sans-serif";
-  g.fillText("🪞 톡미러 TalkMirror", W/2, 60);
-  // 관계 뱃지
-  g.font="800 36px Pretendard, sans-serif";
-  wrapText(g,rel.badge,W/2,150,W-80,46,"#ffffff");
+  g.fillStyle="rgba(44,44,44,.4)"; g.font="600 20px Pretendard, sans-serif";
+  g.fillText("🪞 TALK MIRROR", W/2, 56);
   // 구분선
-  g.strokeStyle="rgba(255,255,255,.12)"; g.lineWidth=1;
-  g.beginPath(); g.moveTo(80,210); g.lineTo(W-80,210); g.stroke();
-  // 온도 링
-  drawTempRing(g,W/2,360,110);
-  g.fillStyle="#fff"; g.font="800 68px Pretendard, sans-serif";
-  g.fillText(R.temp+"°",W/2,376);
-  g.fillStyle="#9CA3AF"; g.font="600 17px Pretendard, sans-serif";
-  g.fillText("감정 온도",W/2,412);
-  // 지표 두 줄
+  g.strokeStyle="rgba(0,0,0,.08)"; g.lineWidth=1;
+  g.beginPath(); g.moveTo(70,76); g.lineTo(W-70,76); g.stroke();
+  // eyebrow
+  g.fillStyle="#8E7CC3"; g.font="700 11px Pretendard, sans-serif";
+  g.fillText("우리 대화가 비추는 관계", W/2, 116);
+  // 관계 뱃지 (Playfair)
+  g.font="bold 38px 'Playfair Display', Georgia, serif";
+  wrapText(g,rel.badge,W/2,178,W-80,50,"#2C2C2C");
+  // 온도 링 + 숫자
+  drawTempRing(g,W/2,350,108);
+  g.fillStyle="rgba(255,255,255,.88)"; g.beginPath(); g.arc(W/2,350,84,0,7); g.fill();
+  g.font="bold 70px 'Playfair Display', Georgia, serif"; g.fillStyle="#2C2C2C";
+  g.fillText(R.temp+"°",W/2,372);
+  g.font="500 15px Pretendard, sans-serif"; g.fillStyle="#5C5C6E";
+  g.fillText("감정 온도",W/2,406);
+  // 스탯 박스
   const A=R.A,B=R.B;
   const msgApct=Math.round(R.P[A].msgs/R.totalMsg*100);
   const initApct=Math.round(R.P[A].initiations/R.totalInit*100);
-  g.fillStyle="rgba(255,255,255,.06)"; roundRect(g,50,510,W-100,210,20); g.fill();
-  // 페르소나
-  g.fillStyle="#6C8CFF"; g.font="700 16px Pretendard, sans-serif"; g.textAlign="left";
-  g.fillText("소통 성향",70,548);
-  g.fillStyle="#F9FAFB"; g.font="600 18px Pretendard, sans-serif";
-  g.fillText(`${cut(A,6)}  ${pa.title}`,70,580);
-  g.fillText(`${cut(B,6)}  ${pb.title}`,70,610);
-  g.strokeStyle="rgba(255,255,255,.10)"; g.lineWidth=1;
-  g.beginPath(); g.moveTo(70,628); g.lineTo(W-70,628); g.stroke();
-  // 발화량
-  g.fillStyle="#A78BFA"; g.font="700 15px Pretendard, sans-serif";
-  g.fillText("대화량",70,656);
-  g.fillStyle="#9CA3AF"; g.font="600 15px Pretendard, sans-serif";
-  g.fillText(`${cut(A,5)} ${msgApct}%  :  ${cut(B,5)} ${100-msgApct}%`,70,680);
-  // 선톡
-  g.fillStyle="#A78BFA"; g.font="700 15px Pretendard, sans-serif";
-  g.fillText("선톡",70,704);
-  g.fillStyle="#9CA3AF"; g.font="600 15px Pretendard, sans-serif";
-  g.fillText(`${cut(A,5)} ${initApct}%  :  ${cut(B,5)} ${100-initApct}%`,70,728);
-  // CTA 배너
-  g.fillStyle="rgba(108,140,255,.20)"; roundRect(g,50,750,W-100,38,19); g.fill();
-  g.strokeStyle="rgba(108,140,255,.40)"; g.lineWidth=1.2; g.stroke();
+  g.fillStyle="rgba(255,255,255,.82)"; roundRect(g,50,488,W-100,218,20); g.fill();
+  g.strokeStyle="rgba(255,255,255,.92)"; g.lineWidth=1; g.stroke();
+  g.fillStyle="#8E7CC3"; g.font="700 15px Pretendard, sans-serif"; g.textAlign="left";
+  g.fillText("소통 성향",70,526);
+  g.fillStyle="#2C2C2C"; g.font="600 17px Pretendard, sans-serif";
+  g.fillText(`${cut(A,6)}  ${pa.title}`,70,556); g.fillText(`${cut(B,6)}  ${pb.title}`,70,584);
+  g.strokeStyle="rgba(0,0,0,.07)"; g.lineWidth=1;
+  g.beginPath(); g.moveTo(70,600); g.lineTo(W-70,600); g.stroke();
+  g.fillStyle="#B4A8DC"; g.font="700 14px Pretendard, sans-serif";
+  g.fillText("대화량",70,624);
+  g.fillStyle="#5C5C6E"; g.font="500 14px Pretendard, sans-serif";
+  g.fillText(`${cut(A,5)} ${msgApct}%  :  ${cut(B,5)} ${100-msgApct}%`,70,646);
+  g.fillStyle="#B4A8DC"; g.font="700 14px Pretendard, sans-serif";
+  g.fillText("선톡",70,668);
+  g.fillStyle="#5C5C6E"; g.font="500 14px Pretendard, sans-serif";
+  g.fillText(`${cut(A,5)} ${initApct}%  :  ${cut(B,5)} ${100-initApct}%`,70,690);
+  // CTA
+  const ctaBg=g.createLinearGradient(50,730,W-50,730);
+  ctaBg.addColorStop(0,"#8E7CC3"); ctaBg.addColorStop(1,"#B4A8DC");
+  g.fillStyle=ctaBg; roundRect(g,50,726,W-100,42,21); g.fill();
   g.fillStyle="#fff"; g.font="700 15px Pretendard, sans-serif"; g.textAlign="center";
-  g.fillText("🔍 톡미러에서 우리 대화 분석해보기",W/2,774);
+  g.fillText("🔍 톡미러에서 우리 대화 분석해보기",W/2,752);
 }
 
 let shareMode="insta";
